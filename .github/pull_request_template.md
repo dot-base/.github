@@ -1,7 +1,8 @@
----
-name: 🚀 New Feature
-about: Adds a new feature.
+Please choose one of the following templates and remove all other templates including the header content which is wrappen in ---.
 
+---
+🚀 New Feature
+Add a new feature.
 ---
 
 This resolves #1337.
@@ -19,10 +20,10 @@ This PR introduces a [feature description].
 - Introduces some weird bug (#666) which needs to be fixed before merging this!
 - All documents are now missing (#404)
 
----
-name: 🧯 Bugfix
-about: Fixes unwanted behavior due to a bug.
 
+---
+🧯 Bugfix
+Submit a fix for some unwanted behavior due to a bug.
 ---
 
 This PR fixes #1234.
@@ -32,11 +33,11 @@ This PR fixes #1234.
 - [ ] Chang this to that
 - [ ] Add something in some file
 
----
-name: 🎉 Release
-about: Submits code that has been tested for a release.
-title: "v0.0.1"
 
+---
+🎉 Release
+Submit code that has been tested for a release.
+title: "v0.0.1"
 ---
 
 ### ‼ Breaking Changes
