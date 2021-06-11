@@ -2,16 +2,15 @@
 name: 🔥 Bug
 about: Something that needs fixing.
 title: ""
-labels: bug
-assignees: ''
+labels: "Type: Bug"
+assignees: ""
 
 ---
 
-### 🔥 Describe the Bug
+### 🔥 Bug Description
 A clear and concise description of what the bug is.
 
 ### 🔍 Steps to Reproduce the Bug
-Steps to reproduce the behavior:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
