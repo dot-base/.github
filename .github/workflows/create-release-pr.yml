@@ -3,9 +3,9 @@ name: ✨ Create Release PR
 on:
   workflow_call:
     secrets:
-      GH_BOT_PAT:
+      GH_BOT_USER:
         required: true
-      CR_PAT:
+      GH_BOT_PAT:
         required: true
 
 jobs:
