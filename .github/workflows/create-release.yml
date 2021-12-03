@@ -1,0 +1,117 @@
+name: Create Release
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+      CR_PAT:
+        required: true
+      SENTRY_AUTH_TOKEN:
+        required: true
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_BOT_PAT }}
+          ref: "master"
+
+      - name: Install conventional-changelog
+        run: |
+          npm i conventional-changelog-conventionalcommits
+
+      - name: Generate Changelog
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v3
+        with:
+          github-token: ${{ secrets.github_token }}
+          release-count: 0 # keep all changes in changelog
+          output-file: "false"
+          skip-version-file: "true"
+          skip-commit: "true"
+          git-push: "false"
+          config-file-path: ".github/changelog.config.js"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          commitish: "master"
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          release_name: ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+
+      - name: Fast Forward dev to master
+        run: |
+          git reset --hard
+          git checkout dev
+          git merge --ff-only origin/master
+          git push
+
+      - name: Manage Milestones
+        uses: actions/github-script@v5
+        with:
+          script: |
+            // get next milestone
+            const milestones = await github.paginate('GET /repos/{owner}/{repo}/milestones', {
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            })
+            const nextMilestone = milestones.find((m) => m.title === 'next');
+            
+            // update current milestone
+            if(nextMilestone) {
+              console.log('Renaming and closing current milestone');
+              await github.request('PATCH /repos/{owner}/{repo}/milestones/{milestone_number}', {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                milestone_number: nextMilestone.number,
+                title: '${{ steps.changelog.outputs.tag }}',
+                state: 'closed'
+              });
+            }
+            
+            // create new milestone
+            console.log('Opening new "next" milestone');
+            await github.request('POST /repos/{owner}/{repo}/milestones', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'next'
+            });
+
+      - name: Build and Publish Docker Image @:latest and @:v_._._
+        run: |
+          # copose image ID and change all uppercase to lowercase
+          IMAGE_ID=ghcr.io/${{ github.repository }}
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # get version and strip v from the front
+          VERSION=${{ steps.changelog.outputs.tag }}
+          VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # build docker image
+          docker build . --file Dockerfile --tag $IMAGE_ID:latest --tag $IMAGE_ID:$VERSION
+
+          # log into docker registry
+          echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          # push images
+          docker push $IMAGE_ID:latest
+          docker push $IMAGE_ID:$VERSION
+
+      # - name: Create Sentry Release
+      #   uses: getsentry/action-release@v1
+      #   env:
+      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      #     SENTRY_ORG: dotbase
+      #     SENTRY_PROJECT: ${{ github.event.repository.name }}
+      #   with:
+      #     environment: production
+      #     version: ${{ steps.changelog.outputs.tag }}

@@ -1,0 +1,45 @@
+name: Get PR
+
+on:
+  workflow_call:
+    outputs:
+      pr:
+        description: "The pull request related to the triggering event"
+        value: ${{ jobs.get-pr.outputs.pr }}
+
+jobs:
+  get-pr:
+    name: Get PR
+    runs-on: ubuntu-latest
+    outputs:
+      pr: ${{ steps.get_pr.outputs.result }}
+    steps:
+      - name: Get PR
+        id: get_pr
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const prResponse = await github.paginate("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            });
+
+            const pr = prResponse[0];
+            if (!pr) throw new Error('Could not find PR.');
+            
+            let type = '';
+            if (pr.base.ref === 'master' && pr.head.ref === 'dev') {
+              type = 'release';
+            } else if (pr.base.ref === 'dev') {
+              type = 'feature';
+            }
+
+            // mergeable_state is a semi documented field in the GitHub API
+            // official docs: https://docs.github.com/en/graphql/reference/enums#mergestatestatus
+            // inofficial (better) docs: https://github.com/octokit/octokit.net/issues/1763
+            const isMergeable = pr.mergeable_state == 'clean' || pr.mergeable_state == 'unstable';
+            Object.assign(pr, { type: type, isMergeable: isMergeable });
+
+            console.log(pr);
+            return pr;

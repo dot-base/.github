@@ -1,0 +1,24 @@
+name: Lint PR Title
+
+on:
+  workflow_call:
+    inputs:
+      pr:
+        required: true
+        type: string
+
+jobs:
+  lint-pr-title:
+    name: Lint PR Title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lint PR Title
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const pr = ${{ inputs.pr }};
+
+            const conventionalChangelogRegex = /^(?<type>build|chore|ci|docs|feat|fix|perf|refactor|test)(?<scope>\([a-z0-9-]+\))?: (?<message>.*)$/;
+            const prTitleMatchesConventionalChangelog = conventionalChangelogRegex.test(pr.title);
+
+            if(!prTitleMatchesConventionalChangelog) throw new Error('PR Title does not match conventional changelog format. Test your PR title against this regex: https://regex101.com/r/jZCN3N/1');

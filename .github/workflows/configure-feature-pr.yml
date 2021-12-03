@@ -1,0 +1,67 @@
+name: Configure Feature PR
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_USER:
+        required: true
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      pr:
+        required: true
+        type: string
+
+jobs:
+  configure-feature-pr:
+    name: Configure Feature PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure Feature PR
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const pr = ${{ inputs.pr }};
+            console.log(`Trying to configure PR ${pr.number}.`);
+
+            console.log(`Setting assignee`);
+            await github.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              assignees: [ '${{ secrets.GH_BOT_USER }}' ]
+            });
+            console.log(`Assignee set`);
+
+            console.log('Setting reviewers');
+            if ((!pr.requested_reviewers || !pr.requested_reviewers.length) && 
+                (!pr.requested_teams || !pr.requested_teams.length)) {
+              await github.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers', {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                team_reviewers: [ 'development' ]
+              });
+              console.log('Reviewers set');
+            } else console.log('Reviewers are already set');
+
+            console.log(`Setting milestone`);
+            if (!pr.milestone) {
+              const milestones = await github.paginate('GET /repos/{owner}/{repo}/milestones', {
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              })
+              const nextMilestone = milestones.find((m) => m.title === 'next');
+              if(!nextMilestone) throw "Milestone 'next' not found";
+
+              await github.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                milestone: nextMilestone.number
+              })
+              console.log(`Milestone set`);
+            } else console.log('Milestone is already set');
+
+            console.log(`PR ${pr.number} has been configured.`);

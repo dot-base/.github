@@ -1,0 +1,27 @@
+name: Lint Files and Run Tests
+
+on:
+  workflow_call:
+
+jobs:
+  lint-and-test:
+    name: Lint Files and Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v2
+
+      - name: Set Up Node.js v16
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Lint Files
+        run: npm run lint-without-fix
+
+      - name: Run Tests
+        run: npm run test
