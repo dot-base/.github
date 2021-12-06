@@ -16,7 +16,7 @@ jobs:
         with:
           ref: "dev"
 
-      - name: Build and Publish Docker Image @:latest and @:v_._._
+      - name: Build and Publish Docker Image @:next
         run: |
           # copose image ID and change all uppercase to lowercase
           IMAGE_ID=ghcr.io/${{ github.repository }}
