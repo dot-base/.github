@@ -7,8 +7,6 @@ on:
         required: true
       CR_PAT:
         required: true
-      SENTRY_AUTH_TOKEN:
-        required: true
 
 jobs:
   create-release:
@@ -65,7 +63,7 @@ jobs:
               repo: context.repo.repo
             })
             const nextMilestone = milestones.find((m) => m.title === 'next');
-            
+
             // update current milestone
             if(nextMilestone) {
               console.log('Renaming and closing current milestone');
@@ -77,7 +75,7 @@ jobs:
                 state: 'closed'
               });
             }
-            
+
             // create new milestone
             console.log('Opening new "next" milestone');
             await github.request('POST /repos/{owner}/{repo}/milestones', {
@@ -105,13 +103,3 @@ jobs:
           # push images
           docker push $IMAGE_ID:latest
           docker push $IMAGE_ID:$VERSION
-
-      # - name: Create Sentry Release
-      #   uses: getsentry/action-release@v1
-      #   env:
-      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      #     SENTRY_ORG: dotbase
-      #     SENTRY_PROJECT: ${{ github.event.repository.name }}
-      #   with:
-      #     environment: production
-      #     version: ${{ steps.changelog.outputs.tag }}
