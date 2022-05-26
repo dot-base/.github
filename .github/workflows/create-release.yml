@@ -7,11 +7,17 @@ on:
         required: true
       CR_PAT:
         required: true
+    outputs:
+      tag:
+        description: "The semver tag generated for the created release e.g. v1.2.3"
+        value: ${{ jobs.create-release.outputs.tag }}
 
 jobs:
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.changelog.outputs.tag }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
