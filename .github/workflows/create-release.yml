@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GH_BOT_PAT }}
-          ref: "master"
+          ref: ${{ github.event.repository.default_branch }}
 
       - name: Install conventional-changelog
         run: |
@@ -47,16 +47,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         with:
-          commitish: "master"
+          commitish: ${{ github.event.repository.default_branch }}
           tag_name: ${{ steps.changelog.outputs.tag }}
           release_name: ${{ steps.changelog.outputs.tag }}
           body: ${{ steps.changelog.outputs.clean_changelog }}
 
-      - name: Fast Forward dev to master
+      - name: Fast Forward dev to default-branch
         run: |
           git reset --hard
           git checkout dev
-          git merge --ff-only origin/master
+          git merge --ff-only origin/${{ github.event.repository.default_branch }}
+
           git push
 
       - name: Manage Milestones

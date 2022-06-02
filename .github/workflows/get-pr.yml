@@ -27,9 +27,9 @@ jobs:
 
             const pr = prResponse[0];
             if (!pr) throw new Error('Could not find PR.');
-            
+
             let type = '';
-            if (pr.base.ref === 'master' && pr.head.ref === 'dev') {
+            if ((pr.base.ref === ${{ github.event.repository.default_branch }}) && pr.head.ref === 'dev') {
               type = 'release';
             } else if (pr.base.ref === 'dev') {
               type = 'feature';
