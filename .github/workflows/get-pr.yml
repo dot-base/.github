@@ -27,9 +27,11 @@ jobs:
 
             const pr = prResponse[0];
             if (!pr) throw new Error('Could not find PR.');
-            
+
             let type = '';
-            if (pr.base.ref === 'master' && pr.head.ref === 'dev') {
+
+            // pr to master is a release, to dev is a feature
+            if (pr.base.ref === 'master') {
               type = 'release';
             } else if (pr.base.ref === 'dev') {
               type = 'feature';
