@@ -22,11 +22,12 @@ jobs:
           IMAGE_ID=ghcr.io/${{ github.repository }}
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-          # build docker image
-          docker build . --file Dockerfile --tag $IMAGE_ID:next
-
           # log into docker registry
           echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-          # push images
-          docker push $IMAGE_ID:next
+          # build docker images and push to registry
+          docker buildx build . \
+            --file Dockerfile \
+            --tag $IMAGE_ID:next \
+            --platform linux/amd64,linux/arm64 \
+            --push
