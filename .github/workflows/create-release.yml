@@ -89,6 +89,23 @@ jobs:
               repo: context.repo.repo,
               title: 'next'
             });
+
+            // set tag of open PRs to new "next" milestone
+            console.log('Set tag of open PRs to new "next" milestone');
+            const pulls = await github.request('GET /repos/{owner}/{repo}/pulls?q=is:open+is:pr', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'next'
+            });
+
+            for (pull in pulls) {
+              await github.request('PATCH /repos/{owner}/{repo}/pull/{pull_request_number}', {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_request_number: pull.number,
+                milestone: 'next'
+              });
+            }
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
