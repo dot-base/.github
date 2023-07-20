@@ -90,8 +90,8 @@ jobs:
               title: 'next'
             });
 
-            // set tag of open PRs to new "next" milestone
-            console.log('Set tag of open PRs to new "next" milestone');
+            // set milestone of open PRs to new "next"
+            console.log('Set milestone of open PRs to new "next"');
             const pulls = await github.request('GET /repos/{owner}/{repo}/pulls?q=is:open+is:pr', {
               owner: context.repo.owner,
               repo: context.repo.repo,
