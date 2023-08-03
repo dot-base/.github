@@ -97,12 +97,12 @@ jobs:
               repo: context.repo.repo,
             });
 
-            for (pull in pulls) {
-              await github.request('PATCH /repos/{owner}/{repo}/pull/{pull_request_number}', {
+            for (const pull of pulls) {
+              await github.request('PATCH /repos/{owner}/{repo}/issues/{pull_request_number}', {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_request_number: pull.number,
-                milestone: 'next'
+                milestone: nextMilestone.data.number
               });
             }
       
