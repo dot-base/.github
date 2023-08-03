@@ -2,6 +2,11 @@ name: Merge Release PR
 
 on:
   workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+      CR_PAT:
+        required: true
     inputs:
       pr:
         required: true
@@ -15,6 +20,7 @@ jobs:
       - name: Merge Release PR
         uses: actions/github-script@v5
         with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
           script: |
             const pr = ${{ inputs.pr }};
             try {
