@@ -3,8 +3,10 @@ name: Create Release
 on:
   workflow_call:
     secrets:
-      GH_BOT_PAT:
+      GH_BOT_USER:
         required: true
+      GH_BOT_PAT:
+        required: true        
       CR_PAT:
         required: true
     outputs:
