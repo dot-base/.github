@@ -2,6 +2,11 @@ name: Lint PR Title
 
 on:
   workflow_call:
+    secrets:
+      GH_BOT_USER:
+        required: true
+      GH_BOT_PAT:
+        required: true
     inputs:
       pr:
         required: true
@@ -15,6 +20,7 @@ jobs:
       - name: Lint PR Title
         uses: actions/github-script@v5
         with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
           script: |
             const pr = ${{ inputs.pr }};
 
