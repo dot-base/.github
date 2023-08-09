@@ -2,6 +2,8 @@
 
 This closes https://github.com/dot-base/medical-dashboard/issues/XXXX
 
+BREAKING CHANGE: some breaking change description or DELETE this line. 🚨
+
 # Description 📖
 Provide a description of the changes. Also include motivation and context of the changes.
 
