@@ -71,23 +71,23 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo
             })
-            const nextMilestone = milestones.find((m) => m.title === 'next');
+            const currentMilestone = milestones.find((m) => m.title === 'next');
 
-            // update current milestone
-            if(nextMilestone) {
+            // update current next milestone to released version
+            if(currentMilestone) {
               console.log('Renaming and closing current milestone');
               await github.request('PATCH /repos/{owner}/{repo}/milestones/{milestone_number}', {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                milestone_number: nextMilestone.number,
+                milestone_number: currentMilestone.number,
                 title: '${{ steps.changelog.outputs.tag }}',
                 state: 'closed'
               });
             }
 
-            // create new milestone
+            // create new next milestone
             console.log('Opening new "next" milestone');
-            await github.request('POST /repos/{owner}/{repo}/milestones', {
+            const nextMilestone  = await github.request('POST /repos/{owner}/{repo}/milestones', {
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: 'next'
