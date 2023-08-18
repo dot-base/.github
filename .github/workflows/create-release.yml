@@ -93,13 +93,14 @@ jobs:
               title: 'next'
             });
 
-            // set milestone of open PRs to new "next"
+            // fetch open PRs to to set new "next" milestone
             console.log('Set milestone of open PRs to new "next"');
             const pulls = await github.paginate('GET /repos/{owner}/{repo}/pulls?state=open', {
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
 
+            // set milestone of open PRs to new "next"
             for (const pull of pulls) {
               await github.request('PATCH /repos/{owner}/{repo}/issues/{pull_request_number}', {
                 owner: context.repo.owner,
