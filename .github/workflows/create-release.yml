@@ -3,8 +3,10 @@ name: Create Release
 on:
   workflow_call:
     secrets:
-      GH_BOT_PAT:
+      GH_BOT_USER:
         required: true
+      GH_BOT_PAT:
+        required: true        
       CR_PAT:
         required: true
     outputs:
@@ -20,7 +22,7 @@ jobs:
       tag: ${{ steps.changelog.outputs.tag }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_BOT_PAT }}
           ref: "master"
@@ -60,7 +62,7 @@ jobs:
           git push
 
       - name: Manage Milestones
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GH_BOT_PAT }}
           script: |
