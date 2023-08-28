@@ -2,13 +2,13 @@
 name: 🔥 Bug
 about: Something that needs fixing.
 title: ""
-labels: "Type: Bug"
+labels: ""
 assignees: ""
 
 ---
 
 ### 🔥 Bug Description
-A clear and concise description of what the bug is.
+A clear and concise description of what the bug is. Could you include a screenshot?
 
 ### 🔍 Steps to Reproduce the Bug
 1. Go to '...'
@@ -16,5 +16,5 @@ A clear and concise description of what the bug is.
 3. Scroll down to '....'
 4. See error
 
-### 🧯 Possible Solution
-* Usefull tips or places to start go here.
+### 🧯 References and Tools
+(optional) Useful hints or places to start go here.
