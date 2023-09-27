@@ -32,7 +32,7 @@ jobs:
           skip-version-file: "true"
           skip-commit: "true"
           git-push: "false"
-          config-file-path: ".github/changelog.config.js"
+          config-file-path: "dot-base/.github/.github/changelog.config.js@main"
 
       - name: Create Release PR
         uses: repo-sync/pull-request@v2
