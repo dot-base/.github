@@ -35,9 +35,11 @@ jobs:
             if (!pr) throw new Error('Could not find PR.');
             
             let type = '';
-            if (pr.base.ref === 'master' && pr.head.ref === 'dev') {
+            const isOrdinaryReleasePr = pr.base.ref === 'release' && pr.head.ref === 'main';
+            const isHotfixReleasePr = pr.base.ref === 'release' && new RegExp('fix\/.+').test(pr.head.ref);
+            if (isOrdinaryReleasePr || isHotfixReleasePr) {
               type = 'release';
-            } else if (pr.base.ref === 'dev') {
+            } else if (pr.base.ref === 'main') {
               type = 'feature';
             }
 
