@@ -35,8 +35,6 @@ jobs:
         id: changelog
         uses: TriPSs/conventional-changelog-action@v3
         with:
-          source_branch: "main"
-          destination_branch: "release"
           github-token: ${{ secrets.github_token }}
           release-count: 0 # keep all changes in changelog
           output-file: "false"
