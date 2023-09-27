@@ -27,6 +27,14 @@ jobs:
           token: ${{ secrets.GH_BOT_PAT }}
           ref: "release"
 
+      - name: Check Out .github Repository
+        uses: actions/checkout@v3
+        with:
+            repository: "dot-base/.github"
+            ref: "main"
+            path: "actions-repo"
+            token: ${{ secrets.GH_BOT_PAT }}
+
       - name: Install conventional-changelog
         run: |
           npm i conventional-changelog-conventionalcommits
@@ -41,7 +49,7 @@ jobs:
           skip-version-file: "true"
           skip-commit: "true"
           git-push: "false"
-          config-file-path: ".github/changelog.config.js"
+          config-file-path: "actions-repo/.github/changelog.config.js"
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
