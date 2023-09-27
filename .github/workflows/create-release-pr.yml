@@ -16,7 +16,7 @@ jobs:
       - name: Check Out Repository
         uses: actions/checkout@v3
         with:
-          ref: "dev"
+          ref: "main"
 
       - name: Install conventional-changelog
         run: |
@@ -38,7 +38,8 @@ jobs:
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GH_BOT_PAT }}
-          source_branch: "dev"
+          source_branch: "main"
+          destination_branch: "release"
           pr_title: "chore(release): ${{ steps.changelog.outputs.tag }}"
           pr_body: "${{ steps.changelog.outputs.clean_changelog }}"
           pr_reviewer: "dot-base/development"
