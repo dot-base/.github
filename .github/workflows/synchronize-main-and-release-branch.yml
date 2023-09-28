@@ -1,0 +1,105 @@
+name: Synchronize Release Branch and Main Branch after a Hotfix Release
+
+# After releasing a hotfix, the release branch needs to be synchronized with the main branch again. 
+# Ohterwise, hotfixes would never appear on the main branch and could also cause unexpected merge conflicts for the next regular release
+# If there are no merge conflicts between release and main, we automatically merge release into main.
+# If merge conflicts appear, this action only opens a PR on main.
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_USER:
+        required: true
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      pr:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+
+jobs:
+
+  create-synchronize-pr:
+    name: Creates a PR from release branch to main branch
+    runs-on: ubuntu-latest
+    outputs:
+      pr: ${{ steps.create-sync-pr-step.outputs.pr }}
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v3
+        with:
+          ref: "release"
+
+      - name: Install conventional-changelog
+        run: |
+          npm i conventional-changelog-conventionalcommits
+
+      - name: Generate Changelog
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v3
+        with:
+          github-token: ${{ secrets.github_token }}
+          release-count: 0                                  # keep all changes in changelog
+          output-file: "false"
+          skip-version-file: "true"
+          skip-commit: "true"
+          git-push: "false"
+          config-file-path: "actions-repo/.github/changelog.config.js"
+
+      - name: Create Sync PR
+        id: create-sync-pr-step
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GH_BOT_PAT }}
+          source_branch: "release"
+          destination_branch: "main"
+          pr_title: "sync(hotfix): ${{ inputs.tag }}"
+          pr_body: "${{ steps.changelog.outputs.clean_changelog }}"
+          pr_reviewer: "dot-base/development"
+          pr_assignee: ${{ secrets.GH_BOT_USER }}
+          pr_milestone: ${{ inputs.tag }}
+
+  get-pr:
+    name: Get PR
+    needs: create-synchronize-pr
+    uses: dot-base/.github/.github/workflows/get-pr.yml@main
+    with:
+      pr-to-get: ${{ needs.create-synchronize-pr.outputs.pr }}
+    secrets:
+      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+
+  merge-synchronize-pr:
+    name: Merge release branch into main branch if mergeable
+    runs-on: ubuntu-latest
+    needs: get-pr
+    if: ${{ fromJson(needs.get-pr.outputs.pr).isMergeable }}
+    
+    steps:
+      - name: Merge Synchronize PR 
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const pr = ${{ needs.get-pr.outputs.pr }};
+            try {
+              console.log(`Trying to merge PR ${pr.number}.`);
+              const mergeResponse = await github.request("PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge", { 
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                commit_title: pr.title,
+                commit_message: pr.body,
+                merge_method: "merge"
+              });
+              console.log(`PR ${pr.number} has been merged.`);
+            } catch (e) {
+              const errorMessage = `PR ${pr.number} is not mergeable: ${e.message}`;
+              console.error(errorMessage);
+              throw new Error(errorMessage);
+            }
+
+

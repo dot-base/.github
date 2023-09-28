@@ -11,6 +11,9 @@ on:
       pr:
         description: "The pull request related to the triggering event"
         value: ${{ jobs.get-pr.outputs.pr }}
+    inputs:
+      pr-to-get:
+        type: number
 
 jobs:
   get-pr:
@@ -25,10 +28,12 @@ jobs:
         with:
           github-token: ${{ secrets.GH_BOT_PAT }}
           script: |
+            const pr_to_get = ${{ inputs.pr-to-get }};
+            const 
             const prResponse = await github.paginate("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: context.payload.pull_request.number
+              pull_number: pr_to_get ?? context.payload.pull_request.number
             });
 
             const pr = prResponse[0];
@@ -36,7 +41,7 @@ jobs:
             
             let type = '';
             const isOrdinaryReleasePr = pr.base.ref === 'release' && pr.head.ref === 'main';
-            const isHotfixReleasePr = pr.base.ref === 'release' && new RegExp('fix\/.+').test(pr.head.ref);
+            const isHotfixReleasePr = pr.base.ref === 'release' && pr.head.ref !== 'main';
             if (isOrdinaryReleasePr || isHotfixReleasePr) {
               type = 'release';
             } else if (pr.base.ref === 'main') {
