@@ -13,10 +13,7 @@ on:
       GH_BOT_PAT:
         required: true
     inputs:
-      pr:
-        required: true
-        type: string
-      tag:
+      hotfix-tag:
         required: true
         type: string
 
@@ -58,5 +55,5 @@ jobs:
           pr_body: "${{ steps.changelog.outputs.clean_changelog }}"
           pr_reviewer: "dot-base/development"
           pr_assignee: ${{ secrets.GH_BOT_USER }}
-          pr_milestone: ${{ inputs.tag }}
+          pr_milestone: ${{ inputs.hotfix-tag }}
 
