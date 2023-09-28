@@ -36,21 +36,20 @@ jobs:
             path: "actions-repo"
             token: ${{ secrets.GH_BOT_PAT }}
 
-      - name: Install conventional-changelog
-        run: |
-          npm i conventional-changelog-conventionalcommits
-
-      - name: Generate Changelog
-        id: changelog
-        uses: TriPSs/conventional-changelog-action@v3
+      - name: Get latest release
+        id: get-latest-release
+        uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.github_token }}
-          release-count: 0                                  # keep all changes in changelog
-          output-file: "false"
-          skip-version-file: "true"
-          skip-commit: "true"
-          git-push: "false"
-          config-file-path: "actions-repo/.github/changelog.config.js"
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const response = await github.request('GET /repos/{owner}/{repo}/releases/latest', {
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            const release = response.data;
+
+            if (!release) throw new Error('Could not find latest release.');
+            return release;
 
       - name: Create Sync PR
         id: create-sync-pr-step
@@ -59,9 +58,8 @@ jobs:
           github_token: ${{ secrets.GH_BOT_PAT }}
           source_branch: "release"
           destination_branch: "main"
-          pr_title: "sync(hotfix): ${{ inputs.tag }}"
-          pr_body: "${{ steps.changelog.outputs.clean_changelog }}"
+          pr_title: "sync(hotfix): ${{ fromJson(steps.get-latest-release.outputs.result).tag_name }}"
+          pr_body: "${{ fromJson(steps.get-latest-release.outputs.result).body }}"
           pr_reviewer: "dot-base/development"
           pr_assignee: ${{ secrets.GH_BOT_USER }}
           pr_milestone: "next"
-
