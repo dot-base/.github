@@ -27,6 +27,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: "release"
+      
+      - name: Check Out .github Repository
+        uses: actions/checkout@v3
+        with:
+            repository: "dot-base/.github"
+            ref: "main"
+            path: "actions-repo"
+            token: ${{ secrets.GH_BOT_PAT }}
 
       - name: Install conventional-changelog
         run: |
