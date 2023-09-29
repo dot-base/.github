@@ -13,11 +13,11 @@ on:
         type: string
 
 jobs:
-  configure-feature-pr:
-    name: Configure Feature PR
+  configure-manually-opened-feature-pr:
+    name: Configure Manually Opened Feature PR
     runs-on: ubuntu-latest
     steps:
-      - name: Configure Feature PR
+      - name: Configure Manually Opened Feature PR
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GH_BOT_PAT }}

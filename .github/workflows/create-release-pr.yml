@@ -12,6 +12,8 @@ on:
         required: true
       GH_BOT_PAT:
         required: true
+      FONTAWESOME_NPM_AUTH_TOKEN:
+        required: false
 
 jobs:
   create-release-pr:
@@ -32,6 +34,8 @@ jobs:
             token: ${{ secrets.GH_BOT_PAT }}
 
       - name: Install conventional-changelog
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: |
           npm i conventional-changelog-conventionalcommits
 

@@ -2,6 +2,9 @@ name: Lint Files and Run Tests
 
 on:
   workflow_call:
+    secrets:
+      FONTAWESOME_NPM_AUTH_TOKEN:
+        required: true
 
 jobs:
   lint-and-test:
