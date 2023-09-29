@@ -1,0 +1,67 @@
+name: Create Release
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_USER:
+        required: true
+      GH_BOT_PAT:
+        required: true        
+      CR_PAT:
+        required: true
+      FONTAWESOME_NPM_AUTH_TOKEN:
+        required: false
+    outputs:
+      tag:
+        description: "The semver tag generated for the created release e.g. v1.2.3"
+        value: ${{ jobs.create-release.outputs.tag }}
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.changelog.outputs.tag }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_BOT_PAT }}
+          ref: "release"
+
+      - name: Check Out .github Repository
+        uses: actions/checkout@v3
+        with:
+            repository: "dot-base/.github"
+            ref: "main"
+            path: "actions-repo"
+            token: ${{ secrets.GH_BOT_PAT }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and Publish Docker Image @:latest and @:v_._._
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: |
+          # copose image ID and change all uppercase to lowercase
+          IMAGE_ID=ghcr.io/${{ github.repository }}
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # get version and strip v from the front
+          VERSION=v5.0.0
+          VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # log into docker registry
+          echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          docker buildx build . \
+            --file Dockerfile \
+            --tag $IMAGE_ID:latest \
+            --tag $IMAGE_ID:$VERSION \
+            --platform linux/amd64,linux/arm64 \
+            --push 
+          
