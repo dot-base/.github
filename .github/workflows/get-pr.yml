@@ -39,8 +39,10 @@ jobs:
             const isHotfixReleasePr = pr.base.ref === 'release' && pr.head.ref !== 'main';
             if (isOrdinaryReleasePr || isHotfixReleasePr) {
               type = 'release';
-            } else if (pr.base.ref === 'main') {
+            } else if (pr.base.ref === 'main' && pr.head.ref !== 'release') {
               type = 'feature';
+            } else if (pr.base.ref === 'main' && pr.head.ref === 'release') {
+              type = 'sync';
             }
 
             // mergeable_state is a semi documented field in the GitHub API
