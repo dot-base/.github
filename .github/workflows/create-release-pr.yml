@@ -65,7 +65,7 @@ jobs:
           github_token: ${{ secrets.GH_BOT_PAT }}
           source_branch: ${{ inputs.branch }}
           destination_branch: "release"
-          pr_title: "${{ steps.configure-pr-type.outputs.result }}(release): ${{ steps.changelog.outputs.tag }}"
+          pr_title: "${{ fromJson(steps.configure-pr-type.outputs.result) }}(release): ${{ steps.changelog.outputs.tag }}"
           pr_body: "${{ steps.changelog.outputs.clean_changelog }}"
           pr_reviewer: "dot-base/development"
           pr_assignee: ${{ secrets.GH_BOT_USER }}
