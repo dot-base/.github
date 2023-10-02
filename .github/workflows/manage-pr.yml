@@ -7,6 +7,8 @@ on:
         required: true
       GH_BOT_PAT:
         required: true
+      CR_PAT:
+        required: true
       FONTAWESOME_NPM_AUTH_TOKEN:
         required: false
 
