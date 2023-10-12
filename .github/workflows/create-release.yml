@@ -66,6 +66,7 @@ jobs:
           release_name: ${{ steps.changelog.outputs.tag }}
           body: ${{ steps.changelog.outputs.clean_changelog }}
 
+      # TODO: run only if regular release from main
       - name: Fast Forward main to release
         run: |
           git reset --hard
