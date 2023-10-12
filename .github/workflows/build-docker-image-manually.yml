@@ -37,7 +37,7 @@ jobs:
         with:
           github-token: ${{ secrets.GH_BOT_PAT }}
           script: |
-            const arch = ${{ inputs.architecture }};
+            const arch = "${{ inputs.architecture }}";
             if (arch === "both") {
               return "linux/amd64,linux/arm64";
             }
