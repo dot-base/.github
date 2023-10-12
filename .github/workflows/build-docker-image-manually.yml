@@ -1,0 +1,81 @@
+name: Build Docker Image For Branch
+
+on:
+  workflow_call:
+    inputs:
+      architecture:
+        type: string
+        required: true
+      imageTag:
+        type: string
+        required: true
+        description: "For example: 1.0.0"
+    secrets:
+      GH_BOT_USER:
+        required: true
+      GH_BOT_PAT:
+        required: true        
+      CR_PAT:
+        required: true
+      FONTAWESOME_NPM_AUTH_TOKEN:
+        required: false
+
+jobs:
+  build-docker-image:
+    name: Build Docker Image for ${{ inputs.imageTag }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_BOT_PAT }}
+          ref: ${{ github.ref_name }}
+
+      - name: Configure platform
+        id: configure-platform
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const arch = ${{ inputs.architecture }};
+            if (arch === "both") {
+              return "linux/amd64,linux/arm64";
+            }
+            return "linux/${{ inputs.architecture }}";
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and Publish Docker Image @:latest and @:v_._._
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+          PLATFORM: ${{ fromJson(steps.configure-platform.outputs.result) }}
+        run: |
+          # copose image ID and change all uppercase to lowercase
+          IMAGE_ID=ghcr.io/${{ github.repository }}
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # get version and strip v from the front
+          VERSION=${{ inputs.imageTag }}
+
+          # log into docker registry
+          echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          if [[ -z "$FONTAWESOME_NPM_AUTH_TOKEN" ]] ; \
+            then docker buildx build . \
+                  --file Dockerfile \
+                  --tag $IMAGE_ID:latest \
+                  --tag $IMAGE_ID:$VERSION \
+                  --platform $PLATFORM \
+                  --push ; \
+            else docker buildx build . \
+                  --file Dockerfile \
+                  --tag $IMAGE_ID:latest \
+                  --tag $IMAGE_ID:$VERSION \
+                  --build-arg FONTAWESOME_NPM_AUTH_TOKEN=${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }} \
+                  --platform $PLATFORM \
+                  --push ; \
+          fi
