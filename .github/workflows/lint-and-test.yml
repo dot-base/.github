@@ -5,26 +5,98 @@ on:
     secrets:
       FONTAWESOME_NPM_AUTH_TOKEN:
         required: true
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      RUN_COVERAGE:
+        required: false
+        type: string
+        default: "false"
 
 jobs:
-  lint-and-test:
-    name: Lint Files and Run Tests
+  install-dependencies:
+    name: Install Dependencies
     runs-on: ubuntu-latest
 
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+
+      - name: Install Dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: npm install
+
+  lint:
+    name: Lint Files
+    needs: install-dependencies
+    runs-on: ubuntu-latest
     steps:
       - name: Check Out Repository
         uses: actions/checkout@v3
 
-      - name: Set Up Node.js v16
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 18
+          cache: "npm"
 
       - name: Install Dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: npm install
 
       - name: Lint Files
         run: npm run lint-without-fix
 
-      - name: Run Tests
+  test:
+    name: Test Files
+    needs: install-dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+
+      - name: Install Dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: npm install
+
+      - name: Test
         run: npm run test
+
+  test-coverage:
+    name: Create Test Coverage
+    needs: install-dependencies
+    runs-on: ubuntu-latest
+    if: ${{ inputs.RUN_COVERAGE == 'true' }}
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+
+      - name: Install Dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: npm install
+
+      - name: Generate Coverage Report
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        uses: ArtiomTr/jest-coverage-report-action@v2
+        with:
+          test-script: npm run test:coverage
+          skip-step: install
+          annotations: failed-tests
+          github-token: ${{ secrets.GH_BOT_PAT }}

@@ -11,6 +11,11 @@ on:
         required: true
       FONTAWESOME_NPM_AUTH_TOKEN:
         required: false
+    inputs:
+      RUN_COVERAGE:
+        required: false
+        type: string
+        default: "false"
 
 jobs:
   lint-and-test:
@@ -18,6 +23,8 @@ jobs:
     uses: dot-base/.github/.github/workflows/lint-and-test.yml@main
     secrets:
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+    with:
+      RUN_COVERAGE: ${{ inputs.RUN_COVERAGE }}
 
   get-pr:
     name: Get PR
