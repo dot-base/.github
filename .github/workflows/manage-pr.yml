@@ -23,6 +23,7 @@ jobs:
     uses: dot-base/.github/.github/workflows/lint-and-test.yml@main
     secrets:
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
     with:
       RUN_COVERAGE: ${{ inputs.RUN_COVERAGE }}
 
