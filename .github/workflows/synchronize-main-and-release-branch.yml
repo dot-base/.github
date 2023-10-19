@@ -12,10 +12,6 @@ on:
         required: true
       GH_BOT_PAT:
         required: true
-    inputs:
-      hotfix-tag:
-        required: true
-        type: string
 
 jobs:
 

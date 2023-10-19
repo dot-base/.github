@@ -7,6 +7,11 @@ on:
         required: true
       GH_BOT_PAT:
         required: true
+      CR_PAT:
+        required: true
+      FONTAWESOME_NPM_AUTH_TOKEN:
+        required: true
+      
     inputs:
       pr:
         required: true
@@ -39,6 +44,16 @@ jobs:
               console.error(errorMessage);
               throw new Error(errorMessage);
             }
+
+  create-release:
+    name: Create Release
+    needs: merge-release-pr
+    uses: dot-base/.github/.github/workflows/create-release.yml@main
+    secrets:
+      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+      CR_PAT: ${{ secrets.CR_PAT }}
+      FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
 
   run-sync-main-and-release-branch:
     name: Synchronize Release Branch and Main Branch

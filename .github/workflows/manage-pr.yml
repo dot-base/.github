@@ -55,14 +55,6 @@ jobs:
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
-
-  create-release:
-    name: Create Release
-    needs: merge-release-pr
-    uses: dot-base/.github/.github/workflows/create-release.yml@main
-    secrets:
-      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
-      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
       CR_PAT: ${{ secrets.CR_PAT }}
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
 
