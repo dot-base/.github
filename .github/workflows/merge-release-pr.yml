@@ -60,8 +60,6 @@ jobs:
     needs: merge-release-pr
     if: ${{ fromJson(inputs.pr).type == 'release' && fromJson(inputs.pr).head.ref != 'main' }}
     uses: dot-base/.github/.github/workflows/synchronize-main-and-release-branch.yml@main
-    with:
-      hotfix-tag: ${{ inputs.pr.tag }}
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
