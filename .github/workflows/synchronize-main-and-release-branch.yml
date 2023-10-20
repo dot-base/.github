@@ -14,7 +14,6 @@ on:
         required: true
 
 jobs:
-
   create-synchronize-pr:
     name: Creates a PR from release branch to main branch
     runs-on: ubuntu-latest
@@ -47,12 +46,22 @@ jobs:
             if (!release) throw new Error('Could not find latest release.');
             return release;
 
+      - name: Create a branch for resolving merge conflicts
+        id: create-conflict-branch
+        env:
+          BRANCH_NAME: sync/${{ fromJson(steps.get-latest-release.outputs.result).tag_name }}
+        run: |
+          git reset --hard
+          git checkout -b $BRANCH_NAME
+          git push --set-upstream origin $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+
       - name: Create Sync PR
         id: create-sync-pr-step
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GH_BOT_PAT }}
-          source_branch: "release"
+          source_branch: ${{ steps.create-conflict-branch.outputs.BRANCH_NAME }}
           destination_branch: "main"
           pr_title: "sync(hotfix): ${{ fromJson(steps.get-latest-release.outputs.result).tag_name }}"
           pr_body: "${{ fromJson(steps.get-latest-release.outputs.result).body }}"
