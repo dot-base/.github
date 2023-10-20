@@ -51,10 +51,7 @@ jobs:
         env:
           BRANCH_NAME: sync/${{ fromJson(steps.get-latest-release.outputs.result).tag_name }}
         run: |
-          git reset --hard
-          git checkout -b $BRANCH_NAME
-          git push --set-upstream origin $BRANCH_NAME
-          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          actions-repo/scripts/create-conflict-branch.sh
 
       - name: Create Sync PR
         id: create-sync-pr-step
