@@ -4,6 +4,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+BRANCH_NAME="sync/$VERSION_TAG"
+
 git fetch
 git reset --hard
 git checkout main
@@ -13,11 +15,10 @@ git checkout -b $BRANCH_NAME
 git merge --no-commit --no-ff main
 EXIT_STATUS=$?
 git merge --abort
-if [ $EXIT_STATUS -eq 0 ]
-then
+if [ $EXIT_STATUS -eq 0 ]; then
     # zero exit status means there are no merge conflicts
     # otherwise we need to manually merge
-    git merge --ff-only main
+    git merge --no-ff main -m "sync(feat):$VERSION_TAG"
 fi
 git push --set-upstream origin $BRANCH_NAME
 echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_OUTPUT

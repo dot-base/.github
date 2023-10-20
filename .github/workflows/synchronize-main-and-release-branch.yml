@@ -49,9 +49,9 @@ jobs:
       - name: Create a branch for resolving merge conflicts
         id: create-conflict-branch
         env:
-          BRANCH_NAME: sync/${{ fromJson(steps.get-latest-release.outputs.result).tag_name }}
+          VERSION_TAG: ${{ fromJson(steps.get-latest-release.outputs.result).tag_name }}
         run: |
-          actions-repo/scripts/create-conflict-branch.sh
+          actions-repo/scripts/create-conflict-branch.sh 
 
       - name: Create Sync PR
         id: create-sync-pr-step
