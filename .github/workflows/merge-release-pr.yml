@@ -49,6 +49,8 @@ jobs:
     name: Create Release
     needs: merge-release-pr
     uses: dot-base/.github/.github/workflows/create-release.yml@main
+    with:
+      isHotfixRelease: ${{ fromJson(inputs.pr).type == 'release' && fromJson(inputs.pr).head.ref != 'main' }}
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
@@ -57,9 +59,22 @@ jobs:
 
   run-sync-main-and-release-branch:
     name: Synchronize Release Branch and Main Branch
-    needs: merge-release-pr
-    if: ${{ fromJson(inputs.pr).type == 'release' && fromJson(inputs.pr).head.ref != 'main' }}
+    needs: create-release
+    if: fromJson(inputs.pr).type == 'release' && fromJson(inputs.pr).head.ref != 'main'
     uses: dot-base/.github/.github/workflows/synchronize-main-and-release-branch.yml@main
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}tag
+
+  build-docker-image:
+    name: Build a Docker image for a new release
+    needs: create-release
+    uses: dot-base/.github/.github/workflows/build-docker-image-manually.yml@main
+    with:
+      architecture: both
+      imageTag: ${{ needs.create-release.outputs.imageTag }}
+    secrets:
+      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+      CR_PAT: ${{ secrets.CR_PAT }}
+      FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
