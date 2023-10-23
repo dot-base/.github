@@ -3,13 +3,17 @@ name: 🐳 Build Docker Image For Branch
 on:
   workflow_call:
     inputs:
+      ref:
+        type: string
+        required: true
+        description: "The ref to build the image from. (usually this is a release tag, e.g. v4.0.1)"
       architecture:
         type: string
         required: true
       imageTag:
         type: string
         required: true
-        description: "For example: 1.0.0"
+        description: "The tag for the docker image. (usually a version tag without leading 'v')"
     secrets:
       GH_BOT_USER:
         required: true
@@ -29,7 +33,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_BOT_PAT }}
-          ref: ${{ github.ref_name }}
+          ref: ${{ inputs.ref }}
 
       - name: Configure platform
         id: configure-platform

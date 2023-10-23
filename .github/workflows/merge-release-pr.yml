@@ -75,6 +75,7 @@ jobs:
     needs: create-release
     uses: dot-base/.github/.github/workflows/build-docker-image-manually.yml@main
     with:
+      ref: ${{ needs.create-release.outputs.tag }}
       architecture: both
       imageTag: ${{ needs.create-release.outputs.imageTag }}
     secrets:
