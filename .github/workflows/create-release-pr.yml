@@ -50,14 +50,6 @@ jobs:
           skip-commit: "true"
           git-push: "false"
           config-file-path: "actions-repo/.github/changelog.config.js"
-      
-      - name: Configure PR Type
-        id: configure-pr-type
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const isHotfix = "${{ inputs.branch }}" !== "main";
-            return isHotfix ? "fix" : "chore";
 
       - name: Create Release PR
         uses: repo-sync/pull-request@v2
@@ -65,7 +57,7 @@ jobs:
           github_token: ${{ secrets.GH_BOT_PAT }}
           source_branch: ${{ inputs.branch }}
           destination_branch: "release"
-          pr_title: "${{ fromJson(steps.configure-pr-type.outputs.result) }}(release): ${{ steps.changelog.outputs.tag }}"
+          pr_title: "chore(release): ${{ steps.changelog.outputs.tag }}"
           pr_body: "${{ steps.changelog.outputs.clean_changelog }}"
           pr_reviewer: "dot-base/development"
           pr_assignee: ${{ secrets.GH_BOT_USER }}

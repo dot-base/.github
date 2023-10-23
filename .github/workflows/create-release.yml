@@ -11,10 +11,6 @@ on:
         required: true
       FONTAWESOME_NPM_AUTH_TOKEN:
         required: false
-    inputs:
-      isHotfixRelease:
-        type: string
-        required: true
     outputs:
       tag:
         description: "The semantic version tag generated for the created release e.g. v1.2.3"
@@ -82,7 +78,6 @@ jobs:
           body: ${{ steps.changelog.outputs.clean_changelog }}
 
       - name: Fast Forward main to release
-        if: inputs.isHotfixRelease == 'true'
         run: |
           git reset --hard
           git checkout main

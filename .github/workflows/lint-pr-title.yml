@@ -24,7 +24,7 @@ jobs:
           script: |
             const pr = ${{ inputs.pr }};
 
-            const conventionalChangelogRegex = /^(?<type>chore|feat|fix|sync)(?<scope>\([a-z0-9-]+\))?: (?<message>.*)$/;
+            const conventionalChangelogRegex = /^(?<type>chore|feat|fix)(?<scope>\([a-z0-9-]+\))?: (?<message>.*)$/;
             const prTitleMatchesConventionalChangelog = conventionalChangelogRegex.test(pr.title);
 
-            if(!prTitleMatchesConventionalChangelog) throw new Error('PR Title does not match conventional changelog format. Test your PR title against this regex: https://regex101.com/r/L8MSWN/1');
+            if(!prTitleMatchesConventionalChangelog) throw new Error('PR Title does not match conventional changelog format. Test your PR title against this regex: https://regex101.com/r/igER1n/1');
