@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.changelog.outputs.tag }}
-      imageTag: ${{ steps.strip-leading-v.outputs.imageTag }}
+      imageTag: ${{ fromJSON(steps.strip-leading-v.outputs.result) }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -61,10 +61,12 @@ jobs:
 
       - name: Strip Leading 'v'
         id: strip-leading-v
-        run:
-          # get version and strip v from the front
-          VERSION=${{ steps.changelog.outputs.tag }}
-          echo "imageTag=$(echo $VERSION | sed -e 's/^v//')" >> $GITHUB_OUTPUT
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const version = "${{ steps.changelog.outputs.tag }}";
+            return version.substring(1);
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
