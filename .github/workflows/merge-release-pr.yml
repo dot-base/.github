@@ -56,9 +56,16 @@ jobs:
         with:
           token: ${{ secrets.GH_BOT_PAT }}
           ref: release
+      - name: Check Out .github Repository
+        uses: actions/checkout@v3
+        with:
+            repository: "dot-base/.github"
+            ref: "main"
+            path: "actions-repo"
+            token: ${{ secrets.GH_BOT_PAT }}
       - name: Fast Forward main to release
         run: |
-          scripts/fast-forward-main-to-release.sh
+          actions-repo/scripts/fast-forward-main-to-release.sh
 
   create-release:
     name: Create Release
