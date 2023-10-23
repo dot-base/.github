@@ -1,4 +1,4 @@
-name: 🐳 Build Docker Image For Branch
+name: 🐳 Build Docker Image
 
 on:
   workflow_call:

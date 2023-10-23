@@ -80,7 +80,7 @@ jobs:
   build-docker-image:
     name: Build a Docker image for a new release
     needs: create-release
-    uses: dot-base/.github/.github/workflows/build-docker-image-manually.yml@main
+    uses: dot-base/.github/.github/workflows/build-docker-image.yml@main
     with:
       ref: ${{ needs.create-release.outputs.tag }}
       architecture: both
