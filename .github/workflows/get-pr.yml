@@ -37,6 +37,8 @@ jobs:
             let type = '';
             if (pr.base.ref === 'release') {
               type = 'release';
+            } else if (pr.head.ref === 'main' && pr.base.ref.startsWith('sync')) {
+              type = 'sync';
             } else if (pr.base.ref === 'main') {
               type = 'feature';
             }

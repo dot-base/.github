@@ -6,6 +6,7 @@ IFS=$'\n\t'
 
 git fetch
 git reset --hard
+git checkout $BRANCH_NAME
 git checkout main
-git merge --ff-only release
+git merge --ff-only $BRANCH_NAME
 git push

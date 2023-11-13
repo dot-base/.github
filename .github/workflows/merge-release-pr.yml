@@ -64,8 +64,10 @@ jobs:
             path: "actions-repo"
             token: ${{ secrets.GH_BOT_PAT }}
       - name: Fast Forward main to release
+        env:
+          BRANCH_NAME: release
         run: |
-          actions-repo/scripts/fast-forward-main-to-release.sh
+          actions-repo/scripts/fast-forward-main.sh
 
   create-release:
     name: Create Release
