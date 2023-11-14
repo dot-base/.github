@@ -14,7 +14,7 @@ on:
 
 jobs:
   create-sync-pr:
-    name: Creates a PR from release branch to main branch
+    name: Creates a PR from main into a sync branch
     runs-on: ubuntu-latest
     steps:
       - name: Check Out Repository
@@ -57,8 +57,8 @@ jobs:
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GH_BOT_PAT }}
-          source_branch: ${{ steps.create-conflict-branch.outputs.BRANCH_NAME }}
-          destination_branch: "main"
+          source_branch: "main"
+          destination_branch: ${{ steps.create-conflict-branch.outputs.BRANCH_NAME }}
           pr_title: "sync(hotfix): ${{ fromJson(steps.get-latest-release.outputs.result).tag_name }}"
           pr_body: "${{ fromJson(steps.get-latest-release.outputs.result).body }}"
           pr_reviewer: "dot-base/development"
