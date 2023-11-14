@@ -79,6 +79,15 @@ jobs:
       CR_PAT: ${{ secrets.CR_PAT }}
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
 
+  create-sync-pr:
+    name: Synchronize Main Branch After a Hotfix Release
+    needs: merge-release-pr
+    if: fromJSON(inputs.pr).head.ref != 'main'
+    uses: dot-base/.github/.github/workflows/create-sync-pr.yml@main
+    secrets:
+      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+
   build-docker-image:
     name: Build a Docker image for a new release
     needs: create-release
