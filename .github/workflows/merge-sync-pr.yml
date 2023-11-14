@@ -60,5 +60,6 @@ jobs:
             - name: Fast Forward main to sync branch
               env:
                 BRANCH_NAME: ${{ fromJSON(inputs.pr).base.ref }}
+                DELETE_BRANCH: "true"
               run: |
                 actions-repo/scripts/fast-forward-main.sh

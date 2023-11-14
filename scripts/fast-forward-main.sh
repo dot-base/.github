@@ -10,3 +10,7 @@ git checkout $BRANCH_NAME
 git checkout main
 git merge --ff-only $BRANCH_NAME
 git push
+if [ -n $DELETE_BRANCH ]
+then
+git push --delete origin $BRANCH_NAME
+fi
