@@ -82,7 +82,7 @@ jobs:
 
   create-sync-pr:
     name: Synchronize Main Branch After a Hotfix Release
-    needs: merge-release-pr
+    needs: create-release
     if: fromJSON(inputs.pr).head.ref != 'main'
     uses: dot-base/.github/.github/workflows/create-sync-pr.yml@main
     secrets:
