@@ -18,6 +18,7 @@ jobs:
         with:
           token: ${{ secrets.GH_BOT_PAT }}
           ref: release
+          fetch-depth: "0"
       - name: Check Out .github Repository
         uses: actions/checkout@v3
         with:
