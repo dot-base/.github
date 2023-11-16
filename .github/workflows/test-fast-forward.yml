@@ -1,0 +1,32 @@
+name: 🚧 Test fast forward 🚧
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_USER:
+        required: true
+      GH_BOT_PAT:
+        required: true
+
+jobs:
+  update-main:
+    name: Update 'main' branch with release commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_BOT_PAT }}
+          ref: release
+      - name: Check Out .github Repository
+        uses: actions/checkout@v3
+        with:
+          repository: "dot-base/.github"
+          ref: "main"
+          path: "actions-repo"
+          token: ${{ secrets.GH_BOT_PAT }}
+      - name: Fast Forward main to release
+        env:
+          BRANCH_NAME: release
+        run: |
+          actions-repo/scripts/fast-forward-main.sh
