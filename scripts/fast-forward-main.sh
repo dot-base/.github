@@ -6,11 +6,18 @@ IFS=$'\n\t'
 
 git fetch
 git reset --hard
+echo "🚧 Working Directory"
+pwd
+echo "🚧 Release Commits"
 git checkout $BRANCH_NAME
+git status
+git log --oneline -10
+echo "🚧 Main commits"
 git checkout main
-git merge --ff-only $BRANCH_NAME
-git push
-if [ -n $DELETE_BRANCH ]
-then
-git push --delete origin $BRANCH_NAME
-fi
+git status
+git log --oneline -10
+echo "🔥 Trying to merge"
+git merge --allow-unrelated-histories --ff-only $BRANCH_NAME
+echo "💥 Merge results"
+git log --oneline -10
+git status
