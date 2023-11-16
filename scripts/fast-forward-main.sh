@@ -17,7 +17,7 @@ git checkout main
 git status
 git log --oneline -10
 echo "🔥 Trying to merge"
-git merge --allow-unrelated-histories --ff-only $BRANCH_NAME
+git merge --ff-only $BRANCH_NAME
 echo "💥 Merge results"
 git log --oneline -10
 git status
