@@ -1,0 +1,24 @@
+name: MVN Build
+
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        type: number
+        required: true
+
+jobs:
+  mvn-build:
+    name: MVN Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ inputs.java-version }}
+
+      - name: Build with Maven
+        run: mvn clean install

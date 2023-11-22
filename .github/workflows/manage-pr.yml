@@ -16,20 +16,33 @@ on:
         required: false
         type: string
         default: "false"
+      SERVICE_TYPE:
+        type: string
+        default: "node"
+      JAVA_VERSION:
+        type: number
 
 jobs:
-  lint-and-test:
-    name: Lint Files and Run Tests
-    uses: dot-base/.github/.github/workflows/lint-and-test.yml@main
+  node-lint-and-test:
+    name: Lint Files and Run Tests (Node Service)
+    uses: dot-base/.github/.github/workflows/node-lint-and-test.yml@main
+    if: inputs.SERVICE_TYPE == 'node'
     secrets:
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
     with:
       RUN_COVERAGE: ${{ inputs.RUN_COVERAGE }}
 
+  maven-build:
+    name: MVN Build
+    uses: dot-base/.github/.github/workflows/mvn-build.yml@main
+    if: inputs.SERVICE_TYPE == 'maven'
+    with:
+      java-version: ${{ inputs.JAVA_VERSION }}
+
   get-pr:
     name: Get PR
-    needs: lint-and-test
+    needs: node-lint-and-test
     uses: dot-base/.github/.github/workflows/get-pr.yml@main
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
