@@ -60,7 +60,7 @@ jobs:
           source_branch: "main"
           destination_branch: ${{ steps.create-conflict-branch.outputs.BRANCH_NAME }}
           pr_title: "sync(hotfix): ${{ fromJson(steps.get-latest-release.outputs.result).tag_name }}"
-          pr_body: "${{ fromJson(steps.get-latest-release.outputs.result).body }}"
+          pr_body: "This resolves potential merge conflicts between the hotfix release ${{ fromJson(steps.get-latest-release.outputs.result).tag_name }} and the main branch."
           pr_reviewer: "dot-base/development"
           pr_assignee: ${{ secrets.GH_BOT_USER }}
           pr_milestone: "next"
