@@ -49,4 +49,6 @@ jobs:
             const isMergeable = pr.mergeable_state == 'clean' || pr.mergeable_state == 'unstable';
             Object.assign(pr, { type: type, isMergeable: isMergeable });
 
+            console.log(`Got PR. Type is ${type} and mergeable_state is ${pr.mergeable_state}.`);
+
             return pr;
