@@ -32,7 +32,7 @@ jobs:
             const prResponse = await github.paginate("GET /repos/{owner}/{repo}/pulls/{pull_number}", {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: !!${{ inputs.pr_number }} ? ${{ inputs.pr_number }} : context.payload.pull_request.number
+              pull_number: !!"${{ inputs.pr_number }}" ? "${{ inputs.pr_number }}" : context.payload.pull_request.number
             });
 
             const pr = prResponse[0];
