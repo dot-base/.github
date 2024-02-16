@@ -23,22 +23,16 @@ on:
         type: number
 
 jobs:
-  node-lint-and-test:
-    name: Lint Files and Run Tests (Node Service)
-    uses: dot-base/.github/.github/workflows/node-lint-and-test.yml@main
-    if: inputs.SERVICE_TYPE == 'node'
+  code-check:
+    name: Run code checks
+    uses: dot-base/.github/.github/workflows/code-check.yml@main
     secrets:
-      FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+      FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
     with:
       RUN_COVERAGE: ${{ inputs.RUN_COVERAGE }}
-
-  maven-build:
-    name: MVN Build
-    uses: dot-base/.github/.github/workflows/mvn-build.yml@main
-    if: inputs.SERVICE_TYPE == 'maven'
-    with:
-      java-version: ${{ inputs.JAVA_VERSION }}
+      SERVICE_TYPE: ${{ inputs.SERVICE_TYPE }}
+      JAVA_VERSION: ${{ inputs.JAVA_VERSION }}
 
   get-pr:
     name: Get PR
@@ -70,12 +64,12 @@ jobs:
 
   merge-release-pr:
     name: Merge Release PR
-    needs: [get-pr, lint-pr-title, node-lint-and-test, maven-build]
-    # We need this trick to wait for optional jobs. Otherwise all jobs in needs would be required to run this step, even if they are skipped.
-    if: always() && !cancelled() && !contains(needs.*.result, 'failure') && fromJson(needs.get-pr.outputs.pr).type == 'release' && fromJson(needs.get-pr.outputs.pr).isMergeable == true
+    needs: [get-pr, lint-pr-title, code-check]
+    if: fromJson(needs.get-pr.outputs.pr).type == 'release' && fromJson(needs.get-pr.outputs.pr).isMergeable == true
     uses: dot-base/.github/.github/workflows/merge-release-pr.yml@main
     with:
       pr: ${{ needs.get-pr.outputs.pr }}
+      SERVICE_TYPE: ${{ inputs.SERVICE_TYPE }}
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
@@ -84,8 +78,8 @@ jobs:
 
   merge-sync-pr:
     name: Merge Sync PR
-    needs: [get-pr, lint-pr-title, node-lint-and-test, maven-build]
-    if: always() && !cancelled() && !contains(needs.*.result, 'failure') && fromJson(needs.get-pr.outputs.pr).type == 'sync' && fromJson(needs.get-pr.outputs.pr).isMergeable == true
+    needs: [get-pr, lint-pr-title, code-check]
+    if: fromJson(needs.get-pr.outputs.pr).type == 'sync' && fromJson(needs.get-pr.outputs.pr).isMergeable == true
     uses: dot-base/.github/.github/workflows/merge-sync-pr.yml@main
     with:
       pr: ${{ needs.get-pr.outputs.pr }}

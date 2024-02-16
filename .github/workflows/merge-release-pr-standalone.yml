@@ -14,6 +14,9 @@ on:
     inputs:
       pr_number:
         type: string
+      SERVICE_TYPE:
+        required: true
+        type: string
 
 jobs:
   get-pr:
@@ -42,6 +45,7 @@ jobs:
     uses: dot-base/.github/.github/workflows/merge-release-pr.yml@main
     with:
       pr: ${{ needs.get-pr.outputs.pr }}
+      SERVICE_TYPE: ${{ inputs.SERVICE_TYPE }}
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}

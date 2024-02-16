@@ -1,0 +1,42 @@
+name: Check PR code
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+      FONTAWESOME_NPM_AUTH_TOKEN:
+        required: false
+    inputs:
+      RUN_COVERAGE:
+        required: false
+        type: string
+        default: "false"
+      SERVICE_TYPE:
+        type: string
+        default: "node"
+      JAVA_VERSION:
+        type: number
+
+jobs:
+  node-lint-and-test:
+    name: Lint Files and Run Tests (Node Service)
+    uses: dot-base/.github/.github/workflows/node-lint-and-test.yml@main
+    if: inputs.SERVICE_TYPE == 'node'
+    secrets:
+      FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      RUN_COVERAGE: ${{ inputs.RUN_COVERAGE }}
+
+  maven-build:
+    name: MVN Build
+    uses: dot-base/.github/.github/workflows/mvn-build.yml@main
+    if: inputs.SERVICE_TYPE == 'maven'
+    with:
+      java-version: ${{ inputs.JAVA_VERSION }}
+
+  flutter-build:
+    name: Flutter build
+    uses: dot-base/.github/.github/workflows/flutter-build.yml@main
+    if: inputs.SERVICE_TYPE == 'flutter'

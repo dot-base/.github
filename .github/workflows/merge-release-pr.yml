@@ -16,6 +16,9 @@ on:
       pr:
         required: true
         type: string
+      SERVICE_TYPE:
+        required: true
+        type: string
 
 jobs:
   merge-release-pr:
@@ -90,6 +93,7 @@ jobs:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
 
   build-docker-image:
+    if: inputs.SERVICE_TYPE != 'flutter'
     name: Build a Docker image for a new release
     needs: create-release
     uses: dot-base/.github/.github/workflows/build-docker-image.yml@main
