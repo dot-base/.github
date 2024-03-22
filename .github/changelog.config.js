@@ -6,5 +6,6 @@ module.exports = config({
     { type: "feat", section: ":rocket: New Features" },
     { type: "fix", section: ":fire_extinguisher: Bugs" },
     { type: "chore", section: ":broom: Chore" },
+    { type: "chore(deps)", section: ":nut_and_bolt: Dependencies" },
   ],
 });
