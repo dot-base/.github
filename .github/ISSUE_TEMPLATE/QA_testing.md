@@ -17,7 +17,6 @@ Follow the QA Testing Checklist step by step.
 # 🔍 QA Testing Checklist of all relevant dotbase functions
 ## 1. Standard QA Tasks
 
-### 1. Installation PWA dotbase
 
 ### 1. Installation PWA dotbase
 
