@@ -15,7 +15,11 @@ The testing focus should be on the new features of this release (see 2.). At the
 Follow the QA Testing Checklist step by step.
 
 # 🔍 QA Testing Checklist of all relevant dotbase functions
-## 1. Standard QA Tasks
+## 1. Release Specific QA Tasks
+
+[if any]
+
+## 2. Standard QA Tasks
 
 
 ### 1. Installation PWA dotbase
@@ -178,5 +182,3 @@ Follow the QA Testing Checklist step by step.
 - [ ]  4. Change something and reset to the saved state using the reset button.
 - [ ]  5. Verify that the template can be successfully used for creating documents.
 - [ ]  6. Load another document template using the search bar at the top.
-
-## 2. Release Specific QA Tasks
