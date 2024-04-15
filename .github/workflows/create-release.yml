@@ -45,8 +45,10 @@ jobs:
         env:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: |
+          echo "Check folder structures"
           ls -la
           pwd
+          echo "Installing packages"
           npm i
 
       - name: Generate Changelog
