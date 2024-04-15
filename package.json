@@ -1,0 +1,8 @@
+{
+  "name": "github",
+  "version": "1.0.0",
+  "description": "Repository containing issue and pr templates as well as other general guidelines.",
+  "dependencies": {
+    "conventional-changelog-conventionalcommits": "7.0.2"
+  }
+}

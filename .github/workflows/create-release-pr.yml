@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v3
         with:
             repository: "dot-base/.github"
-            ref: "main"
+            ref: "feat/add-package-json"
             path: "actions-repo"
             token: ${{ secrets.GH_BOT_PAT }}
 
@@ -37,7 +37,7 @@ jobs:
         env:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: |
-          npm i conventional-changelog-conventionalcommits
+          npm i
 
       - name: Generate Changelog
         id: changelog
