@@ -57,7 +57,7 @@ jobs:
           skip-version-file: "true"
           skip-commit: "true"
           git-push: "false"
-          config-file-path: "actions-repo/.github/changelog.config.js"
+          config-file-path: "actions-repo/.github/changelog.config.cjs"
 
       - name: Strip Leading 'v'
         id: strip-leading-v
