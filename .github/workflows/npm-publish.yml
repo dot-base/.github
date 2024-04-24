@@ -1,0 +1,49 @@
+name: Create new release of @dotbase/fhir-resources on npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        required: true
+        type: string
+  workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
+    inputs:
+      tag:
+        required: true
+        type: string
+
+jobs:
+  npm-publish:
+    name: Create new release of @dotbase/fhir-resources on npm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_BOT_PAT }}
+          ref: release
+
+      - name: Set up nodejs v16
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Set version in package.json
+        run: |
+          cd src/resource-urls/static
+          npm --no-git-tag-version version ${{ inputs.tag }}
+
+      - name: Build @dotbase/fhir-resources
+        run: npm run build:resource-urls
+
+      - name: Publish package to npm
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: "./build/package.json"

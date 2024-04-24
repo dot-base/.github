@@ -11,6 +11,8 @@ on:
         required: true
       FONTAWESOME_NPM_AUTH_TOKEN:
         required: false
+      NPM_TOKEN:
+          required: false
     inputs:
       RUN_COVERAGE:
         required: false
@@ -21,6 +23,10 @@ on:
         default: "node"
       JAVA_VERSION:
         type: number
+      RUN_NPM_PUBLISH:
+        required: false
+        type: string
+        default: "false"
 
 jobs:
   code-check:
@@ -70,11 +76,13 @@ jobs:
     with:
       pr: ${{ needs.get-pr.outputs.pr }}
       SERVICE_TYPE: ${{ inputs.SERVICE_TYPE }}
+      RUN_NPM_PUBLISH: ${{ inputs.RUN_NPM_PUBLISH }}
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
       CR_PAT: ${{ secrets.CR_PAT }}
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   merge-sync-pr:
     name: Merge Sync PR

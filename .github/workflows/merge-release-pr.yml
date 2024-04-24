@@ -11,6 +11,8 @@ on:
         required: true
       FONTAWESOME_NPM_AUTH_TOKEN:
         required: true
+      NPM_TOKEN:
+        required: false
       
     inputs:
       pr:
@@ -19,6 +21,10 @@ on:
       SERVICE_TYPE:
         required: true
         type: string
+      RUN_NPM_PUBLISH:
+        required: false
+        type: string
+        default: "false"
 
 jobs:
   merge-release-pr:
@@ -106,3 +112,13 @@ jobs:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
       CR_PAT: ${{ secrets.CR_PAT }}
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+
+  npm-publish:
+    if: inputs.RUN_NPM_PUBLISH == 'true'
+    name: Publish a npm package for a new release
+    needs: create-release
+    uses: dot-base/.github/.github/workflows/npm-publish.yml@main
+    with:
+      tag: ${{ needs.create-release.outputs.tag }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
