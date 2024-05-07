@@ -18,6 +18,10 @@ on:
         required: false
         type: string
         default: "false"
+      RUN_TYPECHECK:
+        required: false
+        type: string
+        default: "false"
       SERVICE_TYPE:
         type: string
         default: "node"
@@ -37,6 +41,7 @@ jobs:
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
     with:
       RUN_COVERAGE: ${{ inputs.RUN_COVERAGE }}
+      RUN_TYPECHECK: ${{ inputs.RUN_TYPECHECK }}
       SERVICE_TYPE: ${{ inputs.SERVICE_TYPE }}
       JAVA_VERSION: ${{ inputs.JAVA_VERSION }}
 
