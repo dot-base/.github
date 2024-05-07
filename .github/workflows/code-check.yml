@@ -12,6 +12,10 @@ on:
         required: false
         type: string
         default: "false"
+      RUN_TYPECHECK:
+        required: false
+        type: string
+        default: "false"
       SERVICE_TYPE:
         type: string
         default: "node"
@@ -28,6 +32,7 @@ jobs:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
     with:
       RUN_COVERAGE: ${{ inputs.RUN_COVERAGE }}
+      RUN_TYPECHECK: ${{ inputs.RUN_TYPECHECK }}
 
   maven-build:
     name: MVN Build
