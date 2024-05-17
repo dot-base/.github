@@ -7,7 +7,7 @@ assignees: ""
 
 ---
 
-### 🔥 Bug Description
+# 🔥 Bug Description
 What:
 
 ### 🔍 Steps to Reproduce the Bug
@@ -16,5 +16,5 @@ What:
 3. Scroll down to '....'
 4. See error
 
-### 📸 Screenshots, Links, etc.
+### 🔗 Screenshots, Links, etc.
 If a resource is affected, pls provide the URL:

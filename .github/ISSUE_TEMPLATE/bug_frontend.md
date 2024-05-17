@@ -7,8 +7,8 @@ assignees: ""
 
 ---
 
-## 🔥 Bug Description
-Reported by: <name + outpatient clinic>
+# 🔥 Bug Description
+Reported by: [name + outpatient clinic]
 
 Reported via: [Teams Chat](<url>)
 
@@ -29,4 +29,4 @@ Workflow (& Section or Group):
 3. Scroll down to '....'
 4. See error
 
-### 📸 Screenshots
+### 🔗 Screenshots
