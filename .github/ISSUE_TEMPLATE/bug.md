@@ -8,7 +8,7 @@ assignees: ""
 ---
 
 ### 🔥 Bug Description
-A clear and concise description of what the bug is. Could you include a screenshot?
+What:
 
 ### 🔍 Steps to Reproduce the Bug
 1. Go to '...'
@@ -16,5 +16,5 @@ A clear and concise description of what the bug is. Could you include a screensh
 3. Scroll down to '....'
 4. See error
 
-### 🧯 References and Tools
-(optional) Useful hints or places to start go here.
+### 📸 Screenshots, Links, etc.
+If a resource is affected, pls provide the URL:
