@@ -7,16 +7,20 @@ assignees: ""
 
 ---
 
-### 🚀 Feature Description
-As a [user role], I'd like to [improvement description], in order to [value this improvement adds].
+# 🚀 Feature Description
 
-### ✔ Acceptance Criteria
-- [ ] There is a button for X in Y.
-- [ ] The page Z loads faster.
-- [ ] Input of a date is no longer required in field F.
+Required by: [name + outpatient clinic + link to requirement issue]
 
-### Out-of-scope
-(optional) This is explicitely _not_ part of this issue.
+What: As a [user role], I'd like to [improvement description], in order to [value this improvement adds].
 
-### 🧰 References and Tools
-(optional) Useful hints or places to start go here.
+Why:
+
+How:
+
+### ✔️ Acceptance Criteria
+- [ ] 
+
+### ❌ Out-of-scope
+
+### 🔗 Screenshots, Links, etc.
+

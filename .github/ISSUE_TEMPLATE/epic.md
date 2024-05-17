@@ -7,16 +7,32 @@ assignees: ""
 
 ---
 
-### 📦 Epic Description
-What is the goal and why do we want to achieve it?
+# 📦 Epic Description
+## From Customer Perspective
 
-### ✔ Action Items (Issues)
-- [ ] Refactor A to B.
-- [ ] Implement feature 1.
-- [ ] Implement feature 2.
+Required by: [name + outpatient clinic + link to requirement issue]
 
-### Out-of-scope
-(optional) This is explicitely _not_ part of this issue.
+What:
 
-### 📚 References and Tools
-(optional) Useful hints or places to start go here.
+Why:
+
+How:
+
+
+### ✔️ Acceptance Criteria
+- [ ] 
+
+### 🔗 Screenshots, Links, etc.
+
+## From Technical Perspective
+
+### 🔨 Issues
+- [ ] 
+- [ ] 
+
+
+### ❌ Out-of-scope
+
+
+
+
