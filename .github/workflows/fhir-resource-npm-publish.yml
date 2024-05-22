@@ -1,14 +1,11 @@
 name: Create new release of @dotbase/fhir-resources on npm
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        required: true
-        type: string
   workflow_call:
     secrets:
       NPM_TOKEN:
+        required: true
+      GH_BOT_PAT:
         required: true
     inputs:
       tag:
