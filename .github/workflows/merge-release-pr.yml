@@ -113,11 +113,11 @@ jobs:
       CR_PAT: ${{ secrets.CR_PAT }}
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
 
-  npm-publish:
+  fhir-resource-npm-publish:
     if: inputs.RUN_NPM_PUBLISH == 'true'
     name: Publish a npm package for a new release
     needs: create-release
-    uses: dot-base/.github/.github/workflows/npm-publish.yml@main
+    uses: dot-base/.github/.github/workflows/fhir-resource-npm-publish.yml@main
     with:
       tag: ${{ needs.create-release.outputs.tag }}
     secrets:
