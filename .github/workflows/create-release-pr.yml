@@ -37,11 +37,11 @@ jobs:
         env:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: |
-          npm i conventional-changelog-conventionalcommits
+          npm i conventional-changelog-conventionalcommits@v7.0.2
 
       - name: Generate Changelog
         id: changelog
-        uses: TriPSs/conventional-changelog-action@v3
+        uses: TriPSs/conventional-changelog-action@v5.3.0
         with:
           github-token: ${{ secrets.github_token }}
           release-count: 0                                  # keep all changes in changelog
