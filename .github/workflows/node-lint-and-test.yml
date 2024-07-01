@@ -16,6 +16,10 @@ on:
         required: false
         type: string
         default: "false"
+      RUN_TESTS:
+        required: false
+        type: string
+        default: "true"
 
 jobs:
   install-dependencies:
@@ -59,6 +63,7 @@ jobs:
     name: Test Files
     needs: install-dependencies
     runs-on: ubuntu-latest
+    if: ${{ inputs.RUN_TESTS == 'true' }}
     steps:
       - name: Check Out Repository
         uses: actions/checkout@v3

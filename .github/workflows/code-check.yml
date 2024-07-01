@@ -34,6 +34,15 @@ jobs:
       RUN_COVERAGE: ${{ inputs.RUN_COVERAGE }}
       RUN_TYPECHECK: ${{ inputs.RUN_TYPECHECK }}
 
+  node-lint-only:
+    name: Lint Files (Node)
+    uses: dot-base/.github/.github/workflows/node-lint-and-test.yml@main
+    if: inputs.SERVICE_TYPE == 'resources'
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      RUN_TESTS: "false"
+
   maven-build:
     name: MVN Build
     uses: dot-base/.github/.github/workflows/mvn-build.yml@main
