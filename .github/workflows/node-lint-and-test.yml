@@ -4,7 +4,7 @@ on:
   workflow_call:
     secrets:
       FONTAWESOME_NPM_AUTH_TOKEN:
-        required: true
+        required: false
       GH_BOT_PAT:
         required: true
     inputs:
