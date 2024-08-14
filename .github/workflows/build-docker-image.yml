@@ -79,7 +79,7 @@ jobs:
                   --file Dockerfile \
                   --tag $IMAGE_ID:latest \
                   --tag $IMAGE_ID:$VERSION \
-                  --build-arg FONTAWESOME_NPM_AUTH_TOKEN=${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }} \
+                  --secret id=fontawesome_token,env=FONTAWESOME_NPM_AUTH_TOKEN \
                   --platform $PLATFORM \
                   --push ; \
           fi
