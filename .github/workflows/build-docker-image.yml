@@ -18,14 +18,15 @@ on:
       GH_BOT_USER:
         required: true
       GH_BOT_PAT:
-        required: true        
+        required: true
       CR_PAT:
         required: true
       FONTAWESOME_NPM_AUTH_TOKEN:
         required: false
 
 jobs:
-  build-docker-image:
+  build-docker-image-amd:
+    if: github.event.inputs.architecture == 'amd64' || github.event.inputs.architecture == 'both'
     name: Build Docker Image for ${{ inputs.imageTag }}
     runs-on: ubuntu-latest
     steps:
