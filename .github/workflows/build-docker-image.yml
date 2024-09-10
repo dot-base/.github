@@ -39,3 +39,18 @@ jobs:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
       CR_PAT: ${{ secrets.CR_PAT }}
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+
+  build-arm-docker-image:
+    if: github.event.inputs.architecture == 'arm64' || github.event.inputs.architecture == 'both'
+    name: Build ARM Docker Image for ${{ inputs.imageTag }}
+    uses: ./.github/workflows/build-docker-image-for-arch.yml
+    with:
+      ref: ${{ inputs.ref }}
+      architecture: "arm64"
+      imageTag: ${{ inputs.imageTag }}-arm64
+      runner: dotbase-arm-runner
+    secrets:
+      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+      CR_PAT: ${{ secrets.CR_PAT }}
+      FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
