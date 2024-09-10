@@ -57,7 +57,7 @@ jobs:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
           PLATFORM: ${{ fromJson(steps.configure-platform.outputs.result) }}
         run: |
-          # copose image ID and change all uppercase to lowercase
+          # compose image ID and change all uppercase to lowercase
           IMAGE_ID=ghcr.io/${{ github.repository }}
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
