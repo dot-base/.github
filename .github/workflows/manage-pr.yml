@@ -35,7 +35,7 @@ on:
 jobs:
   code-check:
     name: Run code checks
-    uses: dot-base/.github/.github/workflows/code-check.yml@main
+    uses: dot-base/.github/.github/workflows/code-check.yml@fix-gh-action-workflow-depth-limit-exceeding
     secrets:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
@@ -47,7 +47,7 @@ jobs:
 
   get-pr:
     name: Get PR
-    uses: dot-base/.github/.github/workflows/get-pr.yml@main
+    uses: dot-base/.github/.github/workflows/get-pr.yml@fix-gh-action-workflow-depth-limit-exceeding
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
@@ -55,7 +55,7 @@ jobs:
   lint-pr-title:
     name: Lint PR Title
     needs: get-pr
-    uses: dot-base/.github/.github/workflows/lint-pr-title.yml@main
+    uses: dot-base/.github/.github/workflows/lint-pr-title.yml@fix-gh-action-workflow-depth-limit-exceeding
     with:
       pr: ${{ needs.get-pr.outputs.pr }}
     secrets:
@@ -66,7 +66,7 @@ jobs:
     name: Configure Manually Opened Feature PR
     needs: [get-pr, lint-pr-title]
     if: fromJson(needs.get-pr.outputs.pr).type == 'feature'
-    uses: dot-base/.github/.github/workflows/configure-manually-opened-feature-pr.yml@main
+    uses: dot-base/.github/.github/workflows/configure-manually-opened-feature-pr.yml@fix-gh-action-workflow-depth-limit-exceeding
     with:
       pr: ${{ needs.get-pr.outputs.pr }}
     secrets:
@@ -77,7 +77,7 @@ jobs:
     name: Merge Release PR
     needs: [get-pr, lint-pr-title, code-check]
     if: fromJson(needs.get-pr.outputs.pr).type == 'release' && fromJson(needs.get-pr.outputs.pr).isMergeable == true
-    uses: dot-base/.github/.github/workflows/merge-release-pr.yml@main
+    uses: dot-base/.github/.github/workflows/merge-release-pr.yml@fix-gh-action-workflow-depth-limit-exceeding
     with:
       pr: ${{ needs.get-pr.outputs.pr }}
       SERVICE_TYPE: ${{ inputs.SERVICE_TYPE }}
@@ -93,7 +93,7 @@ jobs:
     name: Merge Sync PR
     needs: [get-pr, lint-pr-title, code-check]
     if: fromJson(needs.get-pr.outputs.pr).type == 'sync' && fromJson(needs.get-pr.outputs.pr).isMergeable == true
-    uses: dot-base/.github/.github/workflows/merge-sync-pr.yml@main
+    uses: dot-base/.github/.github/workflows/merge-sync-pr.yml@fix-gh-action-workflow-depth-limit-exceeding
     with:
       pr: ${{ needs.get-pr.outputs.pr }}
     secrets:
