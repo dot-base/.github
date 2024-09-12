@@ -105,7 +105,6 @@ jobs:
     uses: dot-base/.github/.github/workflows/build-docker-image.yml@main
     with:
       ref: ${{ needs.create-release.outputs.tag }}
-      architecture: both
       imageTag: ${{ needs.create-release.outputs.imageTag }}
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
