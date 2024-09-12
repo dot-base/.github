@@ -25,7 +25,7 @@ on:
 jobs:
   node-lint-and-test:
     name: Lint Files and Run Tests (Node Service)
-    uses: dot-base/.github/.github/workflows/node-lint-and-test.yml@fix-gh-action-workflow-depth-limit-exceeding
+    uses: dot-base/.github/.github/workflows/node-lint-and-test.yml@main
     if: inputs.SERVICE_TYPE == 'node'
     secrets:
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
 
   node-lint-only:
     name: Lint Files (Node)
-    uses: dot-base/.github/.github/workflows/node-lint-and-test.yml@fix-gh-action-workflow-depth-limit-exceeding
+    uses: dot-base/.github/.github/workflows/node-lint-and-test.yml@main
     if: inputs.SERVICE_TYPE == 'resources'
     secrets:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
@@ -45,12 +45,12 @@ jobs:
 
   maven-build:
     name: MVN Build
-    uses: dot-base/.github/.github/workflows/mvn-build.yml@fix-gh-action-workflow-depth-limit-exceeding
+    uses: dot-base/.github/.github/workflows/mvn-build.yml@main
     if: inputs.SERVICE_TYPE == 'maven'
     with:
       java-version: ${{ inputs.JAVA_VERSION }}
 
   flutter-build:
     name: Flutter build
-    uses: dot-base/.github/.github/workflows/flutter-build.yml@fix-gh-action-workflow-depth-limit-exceeding
+    uses: dot-base/.github/.github/workflows/flutter-build.yml@main
     if: inputs.SERVICE_TYPE == 'flutter'
