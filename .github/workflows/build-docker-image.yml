@@ -113,7 +113,7 @@ jobs:
             fi
 
   create-docker-manifest:
-    needs: [build-amd-docker-image, build-arm-docker-image]
+    needs: [build-amd64-docker-image, build-arm64-docker-image]
     runs-on: ubuntu-latest
     name: Create and build docker manifest
     steps:
