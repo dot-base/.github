@@ -10,7 +10,7 @@ on:
       CR_PAT:
         required: true
       FONTAWESOME_NPM_AUTH_TOKEN:
-        required: true
+        required: false
       NPM_TOKEN:
         required: false
       
