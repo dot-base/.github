@@ -1,0 +1,37 @@
+name: Sync PR After Merge
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+      
+    inputs:
+      SYNC_BRANCH_NAME:
+        required: true
+        type: string
+
+jobs:
+  update-main:
+    name: Update 'main' branch with sync commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_BOT_PAT }}
+          ref: release
+          fetch-depth: "0"
+      - name: Check Out .github Repository
+        uses: actions/checkout@v3
+        with:
+          repository: "dot-base/.github"
+          ref: "main"
+          path: "actions-repo"
+          token: ${{ secrets.GH_BOT_PAT }}
+      - name: Fast Forward main to sync branch
+        env:
+          BRANCH_NAME: ${{ inputs.SYNC_BRANCH_NAME }}
+          DELETE_BRANCH: "true"
+        run: |
+          actions-repo/scripts/fast-forward-main.sh
