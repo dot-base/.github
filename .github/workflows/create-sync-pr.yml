@@ -36,11 +36,12 @@ jobs:
         with:
           github-token: ${{ secrets.GH_BOT_PAT }}
           script: |
-            const response = await github.request('GET /repos/{owner}/{repo}/releases/latest', {
+            // We cannot use the endpoint for the latest release here, because we need to consider prereleases.
+            const serviceReleases = await github.paginate('GET /repos/{owner}/{repo}/releases', {
               owner: context.repo.owner,
-              repo: context.repo.repo
+              repo: service
             });
-            const release = response.data;
+            const release = serviceReleases[0];
 
             if (!release) throw new Error('Could not find latest release.');
             return release;
