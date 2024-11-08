@@ -39,7 +39,7 @@ jobs:
             // We cannot use the endpoint for the latest release here, because we need to consider prereleases.
             const serviceReleases = await github.paginate('GET /repos/{owner}/{repo}/releases', {
               owner: context.repo.owner,
-              repo: service
+              repo: context.repo.repo
             });
             const release = serviceReleases[0];
 
