@@ -15,9 +15,3 @@ This can also include further thoughts, ideas and improvements.
 # How to Test? 🧪
 
 Provide a list of instructions how to test the changes of this PR.
-
-# Checklist ✅
-- [ ] Commented my code in hard-to-understand areas.
-- [ ] Made corresponding changes to the documentation if applicable.
-- [ ] Added tests if applicable.
-- [ ] Asked someone to review this PR.
