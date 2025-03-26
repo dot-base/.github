@@ -1,0 +1,56 @@
+name: PR Checks
+# This workflow is the new generation of PR checks and can eventually replace 'Manage PR'.
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_USER:
+        required: true
+      GH_BOT_PAT:
+        required: true
+      FONTAWESOME_NPM_AUTH_TOKEN:
+        required: false
+    inputs:
+      RUN_COVERAGE:
+        required: false
+        type: string
+        default: "false"
+      RUN_TYPECHECK:
+        required: false
+        type: string
+        default: "false"
+      SERVICE_TYPE:
+        type: string
+        default: "node"
+      JAVA_VERSION:
+        type: number
+
+jobs:
+  code-check:
+    name: Run code checks
+    uses: dot-base/.github/.github/workflows/code-check.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+      FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+    with:
+      RUN_COVERAGE: ${{ inputs.RUN_COVERAGE }}
+      RUN_TYPECHECK: ${{ inputs.RUN_TYPECHECK }}
+      SERVICE_TYPE: ${{ inputs.SERVICE_TYPE }}
+      JAVA_VERSION: ${{ inputs.JAVA_VERSION }}
+
+  get-pr:
+    name: Get PR
+    uses: dot-base/.github/.github/workflows/get-pr.yml@main
+    secrets:
+      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+
+  lint-pr-title:
+    name: Lint PR Title
+    needs: get-pr
+    uses: dot-base/.github/.github/workflows/lint-pr-title.yml@main
+    with:
+      pr: ${{ needs.get-pr.outputs.pr }}
+    secrets:
+      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
