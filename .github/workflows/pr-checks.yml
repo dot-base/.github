@@ -38,19 +38,20 @@ jobs:
       SERVICE_TYPE: ${{ inputs.SERVICE_TYPE }}
       JAVA_VERSION: ${{ inputs.JAVA_VERSION }}
 
-  get-pr:
-    name: Get PR
-    uses: dot-base/.github/.github/workflows/get-pr.yml@main
-    secrets:
-      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
-      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
-
   lint-pr-title:
     name: Lint PR Title
-    needs: get-pr
-    uses: dot-base/.github/.github/workflows/lint-pr-title.yml@main
-    with:
-      pr: ${{ needs.get-pr.outputs.pr }}
-    secrets:
-      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
-      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Verify Compliance with Conventional Commits
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT }}
+        with:
+          types: |
+            feat
+            fix
+            chore
+          requireScope: false
+
