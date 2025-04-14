@@ -1,8 +1,8 @@
 ---
-name: 🔥 Bug Frontend
-about: Something that is visible in the frontend and needs fixing, because the customer is affected by it.
-title: ""
-labels: ""
+name: 🔥 Bug Reported via Intercom
+about: A bug that was reported by a user via intercom and needs to be resolved.
+title: "Bug Intercom:"
+labels: "intercom"
 assignees: ""
 
 ---
@@ -10,16 +10,15 @@ assignees: ""
 # 🔥 Bug Description
 Reported by: [name + outpatient clinic]
 
-Reported via: [Teams Chat](<url>)
-
 ### ℹ️ About the Bug
 Problem Description:
 
-URL: [Link to Ressource](<url>)
+**URL:** [Link to Ressource](<url>)
 
 --- or ----
 
-Instance:
+**Instance:** [Link to Ressource](<url>)
+
 
 Workflow (& Section or Group):
 
