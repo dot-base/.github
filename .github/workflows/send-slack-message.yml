@@ -1,0 +1,53 @@
+name: Send Slack Message
+
+on:
+  workflow_call:
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: true
+    inputs:
+      status:
+        required: true
+        type: string
+      serviceName:
+        required: true
+        type: string
+      url:
+        required: true
+        type: string
+
+jobs:
+  post-success-slack-notification:
+    name: Post Success Slack Notification
+    runs-on: ubuntu-latest
+    if: ${{ inputs.status == 'success' }}
+    steps:
+      - name: Post message to Slack
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "✅ Successfully deployed `${{ inputs.serviceName }}` app with ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "✅ Successfully deployed `${{ inputs.serviceName }}` app to ${{ inputs.url }} with ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+  post-fail-slack-notification:
+    name: Post Fail Slack Notification
+    runs-on: ubuntu-latest
+    if: ${{ inputs.status == 'failure' }}
+    steps:
+      - name: Post message to Slack
+        uses: slackapi/slack-github-action@v2.0.0
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "❌ Failed to deploy `${{ inputs.serviceName }}` app with ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "❌ Failed to deploy `${{ inputs.serviceName }}` app to ${{ inputs.url }} with ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
