@@ -22,8 +22,25 @@ on:
         default: "true"
 
 jobs:
+  install-dependencies:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+
+      - name: Install Dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: npm install
+
   lint:
     name: Lint Files
+    needs: install-dependencies
     runs-on: ubuntu-latest
     steps:
       - name: Check Out Repository
@@ -44,6 +61,7 @@ jobs:
 
   test:
     name: Test Files
+    needs: install-dependencies
     runs-on: ubuntu-latest
     if: ${{ inputs.RUN_TESTS == 'true' }}
     steps:
@@ -65,6 +83,7 @@ jobs:
 
   typecheck:
     name: Typecheck Files
+    needs: install-dependencies
     runs-on: ubuntu-latest
     if: ${{ inputs.RUN_TYPECHECK == 'true' }}
     steps:
@@ -86,6 +105,7 @@ jobs:
 
   test-coverage:
     name: Create Test Coverage
+    needs: install-dependencies
     runs-on: ubuntu-latest
     if: ${{ inputs.RUN_COVERAGE == 'true' }}
     steps:
