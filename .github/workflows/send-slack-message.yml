@@ -1,4 +1,4 @@
-name: Send Slack Message
+name: Send Post Deployment Slack Message
 
 on:
   workflow_call:
