@@ -33,7 +33,7 @@ jobs:
               - type: "section"
                 text:
                   type: "mrkdwn"
-                  text: "✅ Successfully deployed `${{ inputs.serviceName }}` app to ${{ inputs.url }} with ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                  text: "✅ Successfully deployed `${{ inputs.serviceName }}` app to ${{ inputs.url }} with commit ${{ github.event.pull_request.html_url || github.event.head_commit.url }} in github action job ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
   post-fail-slack-notification:
     name: Post Fail Slack Notification
     runs-on: ubuntu-latest
@@ -50,4 +50,4 @@ jobs:
               - type: "section"
                 text:
                   type: "mrkdwn"
-                  text: "❌ Failed to deploy `${{ inputs.serviceName }}` app to ${{ inputs.url }} with ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                  text: "❌ Failed to deploy `${{ inputs.serviceName }}` app to ${{ inputs.url }} with commit ${{ github.event.pull_request.html_url || github.event.head_commit.url }} in github action job ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
