@@ -18,4 +18,4 @@ This PR has
 - [ ] no config changes
 - [ ] no changes that require a change in other repos
 
-BREAKING CHANGE: If you cannot tick all boxes, there is a breaking change. In this case, add a description here after the keyword. Otherwise delete this line.
+BREAKING CHANGE: If you cannot tick all boxes, there is a breaking change. In this case, add a description here after the keyword. Otherwise DELETE this line.
