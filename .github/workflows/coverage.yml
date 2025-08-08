@@ -46,7 +46,7 @@ jobs:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: npm install
       - name: "Test"
-        run: npx vitest --coverage.enabled true --coverage.reporter=json-summary || true
+        run: npx vitest --coverage.enabled true --coverage.reporter=json-summary --coverage.reporter=json || true
       - name: "Upload Coverage"
         uses: actions/upload-artifact@v4
         with:
@@ -82,7 +82,7 @@ jobs:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: npm install
       - name: "Test"
-        run: npx vitest --coverage.enabled true --coverage.reporter=json-summary || true
+        run: npx vitest --coverage.enabled true --coverage.reporter=json-summary --coverage.reporter=json || true
       - name: "Upload Coverage"
         uses: actions/upload-artifact@v4
         with:
@@ -98,6 +98,8 @@ jobs:
     permissions:
       # Required to checkout the code
       contents: read
+      # Required to put a comment into the pull-request
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
