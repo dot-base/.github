@@ -27,8 +27,6 @@ jobs:
     permissions:
       # Required to checkout the code
       contents: read
-      # Required to put a comment into the pull-request
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -63,8 +61,6 @@ jobs:
     permissions:
       # Required to checkout the code
       contents: read
-      # Required to put a comment into the pull-request
-      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -102,6 +98,7 @@ jobs:
       pull-requests: write
 
     steps:
+      # This is needed to read the vitest.config.ts
       - uses: actions/checkout@v4
         with:
           ref: ${{github.head_ref}}
