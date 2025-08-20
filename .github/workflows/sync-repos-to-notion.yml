@@ -13,17 +13,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (no code needed, but keeps workspace standard)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: "22"
+          cache: "npm"
 
       - name: Install deps
-        run: |
-          npm init -y
-          npm install @octokit/rest @notionhq/client
+        run: npm install @octokit/rest @notionhq/client
 
       - name: Run sync
         env:
