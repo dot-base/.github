@@ -21,7 +21,9 @@ jobs:
           node-version: "22"
 
       - name: Install deps
-        run: npm install @octokit/rest @notionhq/client
+        run: |
+          cd scripts
+          npm install @octokit/rest @notionhq/client
 
       - name: Run sync
         env:
