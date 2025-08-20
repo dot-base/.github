@@ -1,0 +1,38 @@
+name: Sync GitHub repos to Notion
+
+on:
+  schedule:
+    - cron: "17 4 * * *"    # daily at 04:17 UTC
+  workflow_dispatch: {}     # allow manual run
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (no code needed, but keeps workspace standard)
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: |
+          npm init -y
+          npm install @octokit/rest @notionhq/client
+
+      - name: Run sync
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          GITHUB_ORG: ${{ secrets.GITHUB_ORG }}
+          # Personal Access Token (classic) with scopes: read:org, repo (read).
+          # Reason: the default GITHUB_TOKEN can’t reliably enumerate all org repos across visibility settings.
+          GITHUB_TOKEN: ${{ secrets.ORG_PAT }}
+          # Set to "true" to archive Notion pages not found on GitHub
+          NOTION_ARCHIVE_MISSING: "true"
+        run: node scripts/sync_repos_to_notion.mjs
