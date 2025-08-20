@@ -30,8 +30,7 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_REPO_DB_ID: ${{ secrets.NOTION_REPO_DB_ID }}
           GITHUB_ORG: ${{ secrets.ORG_SLUG }}
-          # Personal Access Token (classic) with scopes: read:org, repo (read).
-          # Reason: the default GITHUB_TOKEN can’t reliably enumerate all org repos across visibility settings.
+          # Fine-grained Personal Access Token with scope: Metadata: Read only.
           GITHUB_TOKEN: ${{ secrets.ORG_PAT }}
           # Set to "true" to archive Notion pages not found on GitHub
           NOTION_ARCHIVE_MISSING: "true"
