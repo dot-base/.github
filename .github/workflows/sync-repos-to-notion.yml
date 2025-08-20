@@ -12,6 +12,9 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
+      - name: Go to subdirectory
+        run: cd scripts
+
       - name: Checkout (no code needed, but keeps workspace standard)
         uses: actions/checkout@v3
 
@@ -21,9 +24,7 @@ jobs:
           node-version: "22"
 
       - name: Install deps
-        run: |
-          cd scripts
-          npm install @octokit/rest @notionhq/client
+        run: npm install @octokit/rest @notionhq/client
 
       - name: Run sync
         env:
