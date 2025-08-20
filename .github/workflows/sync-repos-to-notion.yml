@@ -28,7 +28,7 @@ jobs:
       - name: Run sync
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          NOTION_REPO_DB_ID: ${{ secrets.NOTION_REPO_DB_ID }}
           GITHUB_ORG: ${{ secrets.GITHUB_ORG }}
           # Personal Access Token (classic) with scopes: read:org, repo (read).
           # Reason: the default GITHUB_TOKEN can’t reliably enumerate all org repos across visibility settings.

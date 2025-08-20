@@ -3,13 +3,13 @@ import { Client as Notion } from "@notionhq/client";
 
 // ---- Config via env ----
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
-const NOTION_DB_ID = process.env.NOTION_DB_ID;
+const NOTION_REPO_DB_ID = process.env.NOTION_DB_ID;
 const GITHUB_ORG = process.env.GITHUB_ORG;
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const ARCHIVE_MISSING = (process.env.NOTION_ARCHIVE_MISSING || "true").toLowerCase() === "true";
 
 // ---- Guards ----
-if (!NOTION_TOKEN || !NOTION_DB_ID || !GITHUB_ORG || !GITHUB_TOKEN) {
+if (!NOTION_TOKEN || !NOTION_REPO_DB_ID || !GITHUB_ORG || !GITHUB_TOKEN) {
   console.error("Missing env: NOTION_TOKEN, NOTION_DB_ID, GITHUB_ORG, GITHUB_TOKEN are required.");
   process.exit(1);
 }
@@ -141,7 +141,7 @@ async function main() {
   console.log(`Repos fetched: ${repos.length}`);
 
   console.log("Fetching Notion pages…");
-  const pages = await fetchAllNotionPages(NOTION_DB_ID);
+  const pages = await fetchAllNotionPages(NOTION_REPO_DB_ID);
 
   // Enforce uniqueness on "Repo ID": archive duplicates in Notion (keep the first found)
   let archived = 0;
@@ -162,7 +162,7 @@ async function main() {
 
   // Upsert current repos
   for (const repo of repos) {
-    const res = await upsertRepo(NOTION_DB_ID, repo, existingByRepoId);
+    const res = await upsertRepo(NOTION_REPO_DB_ID, repo, existingByRepoId);
     created += res.created;
     updated += res.updated;
     skipped += res.skipped;
