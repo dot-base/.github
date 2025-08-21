@@ -12,21 +12,23 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Go to subdirectory
-        run: cd scripts
-
-      - name: Checkout (no code needed, but keeps workspace standard)
+      - name: Checkout sync tool repository
         uses: actions/checkout@v3
+        with:
+          repository: ${{ secrets.ORG_SLUG }}/ops-automations
+          token: ${{ secrets.GH_BOT_PAT }}
 
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: "22"
+          cache: "npm"
+          cache-dependency-path: package-lock.json
 
       - name: Install deps
-        run: npm install @octokit/rest @notionhq/client
+        run: npm install
 
-      - name: Run sync
+      - name: Run notion sync
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_REPO_DB_ID: ${{ secrets.NOTION_REPO_DB_ID }}
@@ -35,4 +37,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ORG_PAT }}
           # Set to "true" to archive Notion pages not found on GitHub
           NOTION_ARCHIVE_MISSING: "true"
-        run: node scripts/sync_repos_to_notion.mjs
+        run: npm run notionsync
