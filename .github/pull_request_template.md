@@ -16,6 +16,6 @@ This PR has
 - [ ] no migrations
 - [ ] no API changes (removing or changing existing APIs)
 - [ ] no config changes
-- [ ] no changes that require a change in other repos
+- [ ] no changes that would require updates in other repos to avoid breaking them
 
 BREAKING CHANGE: If you cannot tick all boxes, there is a breaking change. In this case, add a description here after the keyword. Otherwise DELETE this line or it will falsely trigger a major version change.
