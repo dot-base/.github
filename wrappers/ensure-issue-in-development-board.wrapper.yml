@@ -13,4 +13,6 @@ jobs:
     uses: dot-base/.github/.github/workflows/ensure-issue-in-development-board.yml@main
     secrets:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
-
+    with:
+      repo_owner: ${{ github.event.repository.owner.login }}
+      repo_name: ${{ github.event.repository.name }}

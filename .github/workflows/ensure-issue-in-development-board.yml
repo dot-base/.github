@@ -13,6 +13,12 @@ on:
       issue_number:
         required: false
         type: number
+      repo_owner:
+        required: false
+        type: string
+      repo_name:
+        required: false
+        type: string
       org_project_v2_id:
         required: false
         type: string
@@ -27,6 +33,8 @@ jobs:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
     with:
       issue_number: ${{ inputs.issue_number }}
+      repo_owner: ${{ inputs.repo_owner || github.event.repository.owner.login }}
+      repo_name: ${{ inputs.repo_name || github.event.repository.name }}
 
   add-issue-to-project:
     name: Ensure Issue In Org Project

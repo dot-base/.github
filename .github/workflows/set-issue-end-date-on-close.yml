@@ -21,15 +21,17 @@ on:
 jobs:
   get-issue:
     name: Get Issue
-    uses: dot-base/.github/.github/workflows/get-issue.yml@feat/add-project-automations
+    uses: dot-base/.github/.github/workflows/get-issue.yml@main
     secrets:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
     with:
       issue_number: ${{ inputs.issue_number }}
+      repo_owner: ${{ github.event.repository.owner.login }}
+      repo_name: ${{ github.event.repository.name }}
 
   get-project-item:
     name: Get Project Item
-    uses: dot-base/.github/.github/workflows/ensure-project-item.yml@feat/add-project-automations
+    uses: dot-base/.github/.github/workflows/ensure-project-item.yml@main
     needs: get-issue
     secrets:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}

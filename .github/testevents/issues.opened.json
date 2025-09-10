@@ -1,5 +1,5 @@
 {
   "action": "opened",
-  "issue": { "number": 2000 },
+  "issue": { "number": 1 },
   "repository": { "owner": { "login": "dot-base" }, "name": "ops-automations" }
 }

@@ -9,6 +9,14 @@ on:
       issue_number:
         required: false
         type: number
+      repo_owner:
+        required: true
+        type: string
+        description: "Owner login of the repository containing the issue"
+      repo_name:
+        required: true
+        type: string
+        description: "Name of the repository containing the issue"
     outputs:
       issue:
         description: "The issue related to the triggering event or input"
@@ -30,6 +38,11 @@ jobs:
             const issueNumber = context.payload.issue?.number ?? Number("${{ inputs.issue_number }}");
             if (!issueNumber) throw new Error('Issue number not provided and no issue in payload.');
 
+            const repoOwner = ("${{ inputs.repo_owner }}" || '').trim();
+            if (!repoOwner) throw new Error('repo_owner is required.');
+            const repoName = ("${{ inputs.repo_name }}" || '').trim();
+            if (!repoName) throw new Error('repo_name is required.');
+
             const query = `
               query($owner: String!, $name: String!, $number: Int!) {
                 repository(owner: $owner, name: $name) {
@@ -48,14 +61,13 @@ jobs:
             `;
 
             const data = await github.graphql(query, {
-              owner: context.repo.owner,
-              name: context.repo.repo,
+              owner: repoOwner,
+              name: repoName,
               number: issueNumber,
             });
 
             const issue = data?.repository?.issue;
             if (!issue) throw new Error('Could not find issue via GraphQL.');
 
-            console.log(`Got issue via GraphQL: #${issue.number} '${issue.title}'`);
+            console.log(`Got issue via GraphQL from ${repoOwner}/${repoName}: #${issue.number} '${issue.title}'`);
             return issue;
-
