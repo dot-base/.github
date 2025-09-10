@@ -28,7 +28,7 @@ on:
 jobs:
   get-issue:
     name: Get Issue
-    uses: dot-base/.github/.github/workflows/get-issue.yml@main
+    uses: dot-base/.github/.github/workflows/get-issue.yml@feat/add-project-automations
     secrets:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
     with:
@@ -38,7 +38,7 @@ jobs:
 
   add-issue-to-project:
     name: Ensure Issue In Org Project
-    uses: dot-base/.github/.github/workflows/ensure-project-item.yml@main
+    uses: dot-base/.github/.github/workflows/ensure-project-item.yml@feat/add-project-automations
     needs: get-issue
     secrets:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}

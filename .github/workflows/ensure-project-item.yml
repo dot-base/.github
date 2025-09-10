@@ -12,6 +12,7 @@ on:
       project_id:
         required: false
         type: string
+        default: "61"
       content_node_id:
         required: false
         type: string

@@ -8,37 +8,87 @@ Prereqs
 
 Setup
 - Copy `.secrets.example` to `.secrets` and fill values (at least `GH_BOT_PAT`).
+  ```bash
+  cp .secrets.example .secrets
+  ```
 - The default runner image is set in `.actrc` to `ghcr.io/catthehacker/ubuntu:act-22.04`.
 
 Common commands
-- List workflows/jobs detected: `act -l`
-- Dry run (no steps executed): `act -n <event>`
-- Run with secrets and a specific event payload: `act <event> -e <path> --secret-file ./.secrets`
-- Run a specific workflow file: `act <event> -W .github/workflows/<file>.yml --secret-file ./.secrets`
+- List workflows/jobs detected:
+  ```bash
+  act -l
+  ```
+- Dry run (no steps executed):
+  ```bash
+  act -n <event>
+  ```
+- Run with secrets and a specific event payload:
+  ```bash
+  act <event> -e <path> --secret-file ./.secrets
+  ```
+- Run a specific workflow file:
+  ```bash
+  act <event> -W .github/workflows/<file>.yml --secret-file ./.secrets
+  ```
 
 Makefile shortcuts
-- `make list` — list workflows/jobs
-- `make dry-run` — dry run all
-- `make set-end-date` — test Set End Date on close
-- `make ensure-issue` — test Ensure Issue in Development Board
-- `make start-date` — test Set Start Date on In Progress
-- `make close-parent` — test Close Parent when last sub-issue closed
-- `make create-label` — test Create Label Across Repos dispatch
+- List workflows/jobs:
+  ```bash
+  make list
+  ```
+- Dry run all:
+  ```bash
+  make dry-run
+  ```
+- Test Set End Date on close:
+  ```bash
+  make set-end-date
+  ```
+- Test Ensure Issue in Development Board:
+  ```bash
+  make ensure-issue
+  ```
+- Test Close Parent when last sub-issue closed:
+  ```bash
+  make close-parent
+  ```
+- Test Create Label Across Repos dispatch:
+  ```bash
+  make create-label
+  ```
 
 Examples
 - Set End Date on issue close
-  - `act issues -W .github/workflows/set-issue-end-date-on-close.yml -e .github/testevents/issues.closed.json --secret-file ./.secrets`
+  ```bash
+  act issues \
+    -W .github/workflows/set-issue-end-date-on-close.yml \
+    -e .github/testevents/issues.closed.json \
+    --secret-file ./.secrets
+  ```
 
 - Ensure issue in development board (on open)
-  - `act issues -W .github/workflows/ensure-issue-in-development-board.yml -e .github/testevents/issues.opened.json --secret-file ./.secrets`
-
-<!-- Removed: Start Date workflow based on Projects v2 item updates -->
+  ```bash
+  act issues \
+    -W .github/workflows/ensure-issue-in-development-board.yml \
+    -e .github/testevents/issues.opened.json \
+    --secret-file ./.secrets
+  ```
 
 - Close parent when last sub-issue is closed
-  - `act issues -W .github/workflows/close-parent-when-last-sub-issue-closed.yml -e .github/testevents/issues.closed.json --secret-file ./.secrets`
+  ```bash
+  act issues \
+    -W .github/workflows/close-parent-when-last-sub-issue-closed.yml \
+    -e .github/testevents/issues.closed.json \
+    --secret-file ./.secrets
+  ```
 
 - Dispatch the create-label helper:
-  - `act workflow_dispatch -W .github/workflows/create-label-across-repos.yml -e .github/testevents/workflow_dispatch.create_label.json --secret-file ./.secrets`
+  ```bash
+  act workflow_dispatch \
+    -W .github/workflows/create-label-across-repos.yml \
+    -e .github/testevents/workflow_dispatch.create_label.json \
+    --secret-file ./.secrets
+  ```
 
 Notes
 - Actions that call GitHub GraphQL/REST require network access and a PAT with required scopes.
