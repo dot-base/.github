@@ -17,7 +17,7 @@ on:
 jobs:
   get-issue:
     name: Get Issue
-    uses: dot-base/.github/.github/workflows/get-issue.yml@main
+    uses: dot-base/.github/.github/workflows/get-issue.yml@feat/add-project-automations
     secrets:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
     with:

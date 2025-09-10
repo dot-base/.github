@@ -32,9 +32,7 @@ Examples
 - Ensure issue in development board (on open)
   - `act issues -W .github/workflows/ensure-issue-in-development-board.yml -e .github/testevents/issues.opened.json --secret-file ./.secrets`
 
-- Set Start Date when Status moves to In Progress (Projects v2 item edited)
-  - `act projects_v2_item -W .github/workflows/set-issue-start-date-on-in-progress.yml -e .github/testevents/projects_v2_item.edited.json --secret-file ./.secrets`
-  - Note: This workflow requires real ProjectV2 item/issue ids and permissions; use a valid PAT and IDs.
+<!-- Removed: Start Date workflow based on Projects v2 item updates -->
 
 - Close parent when last sub-issue is closed
   - `act issues -W .github/workflows/close-parent-when-last-sub-issue-closed.yml -e .github/testevents/issues.closed.json --secret-file ./.secrets`

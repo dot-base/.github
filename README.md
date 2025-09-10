@@ -50,7 +50,7 @@ Other notable workflows you can call or enable by event:
 - `coverage.yml`: generate Jest coverage and annotate via GH bot
 - `build-docker-image.yml`: build and optionally push a Docker image
 - Release helpers: `create-release.yml`, `create-pre-release.yml`, `create-release-pr.yml`, `release-pr-after-merge.yml`, `create-sync-pr.yml`, `sync-pr-after-merge.yml`
-- Project automations: `ensure-issue-in-development-board.yml`, `ensure-project-item.yml`, `set-issue-start-date-on-in-progress.yml`, `set-issue-end-date-on-close.yml`, `close-parent-when-last-sub-issue-closed.yml`
+- Project automations: `ensure-issue-in-development-board.yml`, `ensure-project-item.yml`, `set-issue-end-date-on-close.yml`, `close-parent-when-last-sub-issue-closed.yml`
 - PR management: `manage-pr.yml`, `lint-pr-title.yml`, `configure-manually-opened-feature-pr.yml`, `pr-checks.yml`
 
 Tip: Open any workflow file to see required secrets/inputs.
