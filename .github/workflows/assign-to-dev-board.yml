@@ -1,0 +1,23 @@
+name: Add item to project
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      issue:
+        required: true
+        type: string
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@RELEASE_VERSION
+        with:
+          # You can target a project in a different organization
+          # to the issue
+          project-url: https://github.com/orgs/dot-base/projects/61
+          github-token: ${{ secrets.GH_BOT_PAT }}
