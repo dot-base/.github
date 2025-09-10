@@ -1,0 +1,102 @@
+name: Create Label Across Repos
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Label name"
+        required: true
+        type: string
+      color:
+        description: "Hex color without # (optional)"
+        required: false
+        type: string
+      description:
+        description: "Label description (optional)"
+        required: false
+        type: string
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      name:
+        required: true
+        type: string
+      color:
+        required: false
+        type: string
+      description:
+        required: false
+        type: string
+
+jobs:
+  create-label:
+    name: Create/Update label in all repos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create label across repos
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT || secrets.GITHUB_TOKEN }}
+          script: |
+            const nameInput = "${{ inputs.name }}";
+            if (!nameInput || !nameInput.trim()) throw new Error('name input is required');
+            const owner = context.repo.owner;
+            const name = nameInput.trim();
+            const colorInput = "${{ inputs.color }}";
+            const descInput = "${{ inputs.description }}";
+            const description = (descInput || '').toString();
+
+            let color = (colorInput || 'ededed').replace(/^#/, '').toLowerCase();
+            if (!/^[0-9a-f]{6}$/i.test(color)) {
+              console.log(`Invalid color '${colorInput}', defaulting to ededed`);
+              color = 'ededed';
+            }
+
+            console.log(`Ensuring label '${name}' (color #${color}${description ? `, desc '${description}'` : ''}) across owner '${owner}'`);
+
+            // Fetch repositories for org or user with pagination, skipping archived
+            async function listReposForOwner(owner) {
+              try {
+                const repos = await github.paginate(github.rest.repos.listForOrg, { org: owner, per_page: 100, type: 'all' });
+                return repos;
+              } catch (e) {
+                const msg = e?.message || '';
+                if (msg.includes('Not Found') || e.status === 404) {
+                  // Try as user
+                  const repos = await github.paginate(github.rest.repos.listForUser, { username: owner, per_page: 100, type: 'all' });
+                  return repos;
+                }
+                throw e;
+              }
+            }
+
+            const repos = await listReposForOwner(owner);
+            console.log(`Found ${repos.length} repositories for ${owner}`);
+
+            let created = 0, updated = 0, skipped = 0, failed = 0;
+            for (const r of repos) {
+              if (r.archived) { skipped++; continue; }
+              const repoName = r.name;
+              try {
+                // Try to create first
+                await github.rest.issues.createLabel({ owner, repo: repoName, name, color, description });
+                created++;
+                console.log(`[created] ${owner}/${repoName}`);
+              } catch (e) {
+                const status = e?.status;
+                const msg = e?.message || '';
+                if (status === 422 || (typeof msg === 'string' && msg.toLowerCase().includes('already exists'))) {
+                  // Update existing (PATCH requires current name in path)
+                  await github.rest.issues.updateLabel({ owner, repo: repoName, name, color, description });
+                  updated++;
+                  console.log(`[updated] ${owner}/${repoName}`);
+                } else {
+                  failed++;
+                  console.log(`[failed] ${owner}/${repoName}: ${msg}`);
+                }
+              }
+            }
+
+            console.log(`Done. created=${created}, updated=${updated}, skipped=${skipped}, failed=${failed}`);
