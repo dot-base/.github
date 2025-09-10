@@ -1,0 +1,31 @@
+name: Create Label Across Repos (Wrapper)
+
+# Copy into other repos at .github/workflows/
+# Requires repo secret GH_BOT_PAT with sufficient privileges to manage labels across the owner
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Label name"
+        required: true
+        type: string
+      color:
+        description: "Hex color without # (optional)"
+        required: false
+        type: string
+      description:
+        description: "Label description (optional)"
+        required: false
+        type: string
+
+jobs:
+  create-label:
+    name: Create/Update label in all repos
+    uses: dot-base/.github/.github/workflows/create-label-across-repos.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      name: ${{ inputs.name }}
+      color: ${{ inputs.color }}
+      description: ${{ inputs.description }}
