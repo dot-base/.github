@@ -1,0 +1,73 @@
+name: Set Issue End Date On Close
+
+on:
+  # Auto-run when an issue is closed
+  issues:
+    types: [closed]
+  # Allow reuse from other workflows/repos
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      issue_number:
+        required: false
+        type: number
+      org_project_v2_id:
+        required: false
+        type: string
+        default: "61"
+
+jobs:
+  get-issue:
+    name: Get Issue
+    uses: dot-base/.github/.github/workflows/get-issue.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      issue_number: ${{ inputs.issue_number }}
+
+  get-project-item:
+    name: Get Project Item
+    uses: dot-base/.github/.github/workflows/ensure-project-item.yml@main
+    needs: get-issue
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      project_id: ${{ inputs.org_project_v2_id }}
+      content_node_id: ${{ fromJson(needs.get-issue.outputs.issue).id }}
+
+  set-end-date:
+    name: Set End Date field
+    runs-on: ubuntu-latest
+    needs: get-project-item
+    steps:
+      - name: Update ProjectV2 End Date
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const item = ${{ needs.get-project-item.outputs.item }};
+            const projectId = item.project?.id;
+
+            const projectFields = item.project?.fields?.nodes || [];
+            const endDateField = projectFields.find(f => f?.name === 'End Date');
+            if (!endDateField) throw new Error("Project field 'End Date' not found");
+
+            // Set End Date to today (UTC), always overwrite
+            const today = new Date().toISOString().slice(0, 10);
+            await github.graphql(`
+              mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $date: Date!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId,
+                  itemId: $itemId,
+                  fieldId: $fieldId,
+                  value: { date: $date }
+                }) {
+                  projectV2Item { id }
+                }
+              }
+            `, { projectId, itemId: item.id, fieldId: endDateField.id, date: today });
+
+            const issueNumber = item.content?.number ? `#${item.content.number}` : '(unknown issue)';
+            console.log(`Set End Date for issue ${issueNumber} to ${today}`);

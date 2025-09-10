@@ -1,0 +1,5 @@
+{
+  "action": "closed",
+  "issue": { "number": 2001 },
+  "repository": { "owner": { "login": "dot-base" }, "name": "ops-automations" }
+}

@@ -1,0 +1,39 @@
+name: Ensure Issue In Development Board
+
+on:
+  # Auto-run in this repo on new issues
+  issues:
+    types: [opened, reopened]
+  # Allow reuse from other workflows/repos
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      issue_number:
+        required: false
+        type: number
+      org_project_v2_id:
+        required: false
+        type: string
+        default: "61"
+        ## ${{ vars.ORG_PROJECT_V2_ID }}
+
+jobs:
+  get-issue:
+    name: Get Issue
+    uses: dot-base/.github/.github/workflows/get-issue.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      issue_number: ${{ inputs.issue_number }}
+
+  add-issue-to-project:
+    name: Ensure Issue In Org Project
+    uses: dot-base/.github/.github/workflows/ensure-project-item.yml@main
+    needs: get-issue
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      project_id: ${{ inputs.org_project_v2_id }}
+      content_node_id: ${{ fromJson(needs.get-issue.outputs.issue).id }}

@@ -1,0 +1,17 @@
+name: Set Issue End Date On Close (Wrapper)
+
+# Copy this file into other repos at .github/workflows/
+# Requires repo secret GH_BOT_PAT and repo variable ORG_PROJECT_V2_ID
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  set-end-date:
+    name: Set End Date on Close
+    uses: dot-base/.github/.github/workflows/set-issue-end-date-on-close.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      issue_number: ${{ github.event.issue.number }}

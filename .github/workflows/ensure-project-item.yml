@@ -1,0 +1,115 @@
+name: Ensure Project Item
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      item_node_id:
+        required: false
+        type: string
+      project_id:
+        required: false
+        type: string
+      content_node_id:
+        required: false
+        type: string
+    outputs:
+      item:
+        description: "The ProjectV2 item for the given id or payload"
+        value: ${{ jobs.get-project-item.outputs.item }}
+
+jobs:
+  get-project-item:
+    name: Ensure Project Item
+    runs-on: ubuntu-latest
+    outputs:
+      item: ${{ steps.get_item.outputs.result }}
+    steps:
+      - name: Ensure Project Item via GraphQL
+        id: get_item
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const explicitItem = "${{ inputs.item_node_id }}".trim();
+            const fromEvent = context.payload?.projects_v2_item?.node_id || context.payload?.projects_v2_item?.id || '';
+            const projectId = "${{ inputs.project_id }}".trim();
+            const contentId = "${{ inputs.content_node_id }}".trim();
+
+            async function loadItem(itemId) {
+              const query = `
+                query($itemId: ID!) {
+                  item: node(id: $itemId) {
+                    __typename
+                    ... on ProjectV2Item {
+                      id
+                      project { id title fields(first: 100) { nodes { ... on ProjectV2FieldCommon { id name dataType } } } }
+                      content {
+                        __typename
+                        ... on Issue { id number title }
+                        ... on PullRequest { id number title }
+                      }
+                      fieldValues(first: 100) {
+                        nodes {
+                          __typename
+                          ... on ProjectV2ItemFieldDateValue { date field { ... on ProjectV2FieldCommon { id name } } }
+                          ... on ProjectV2ItemFieldSingleSelectValue { name field { ... on ProjectV2FieldCommon { id name } } }
+                          ... on ProjectV2ItemFieldTextValue { text field { ... on ProjectV2FieldCommon { id name } } }
+                          ... on ProjectV2ItemFieldNumberValue { number field { ... on ProjectV2FieldCommon { id name } } }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+              const data = await github.graphql(query, { itemId });
+              const item = data?.item;
+              if (!item || item.__typename !== 'ProjectV2Item') throw new Error('Could not resolve ProjectV2Item via GraphQL.');
+              return item;
+            }
+
+            if (explicitItem || fromEvent) {
+              const item = await loadItem(explicitItem || fromEvent);
+              console.log(`Got ProjectV2Item ${item.id} for project '${item.project?.title}'`);
+              return item;
+            }
+
+            if (!projectId || !contentId) {
+              throw new Error('Missing item id; provide either item_node_id or both project_id and content_node_id.');
+            }
+
+            // Query existing item for content in the project; create if missing
+            const lookup = `
+              query($projectId: ID!, $contentId: ID!) {
+                project: node(id: $projectId) {
+                  ... on ProjectV2 { id title fields(first: 100) { nodes { ... on ProjectV2FieldCommon { id name dataType } } } }
+                }
+                content: node(id: $contentId) {
+                  __typename
+                  ... on Issue { id number projectItems(first: 50) { nodes { id project { id } } } }
+                  ... on PullRequest { id number projectItems(first: 50) { nodes { id project { id } } } }
+                }
+              }
+            `;
+            const l = await github.graphql(lookup, { projectId, contentId });
+            const project = l?.project;
+            const content = l?.content;
+            if (!project) throw new Error('Could not resolve project');
+            if (!content) throw new Error('Could not resolve content node');
+
+            let item = (content.projectItems?.nodes || []).find(n => n?.project?.id === projectId);
+            if (!item) {
+              const addRes = await github.graphql(`
+                mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) { item { id } }
+                }
+              `, { projectId, contentId });
+              item = addRes?.addProjectV2ItemById?.item;
+              if (!item?.id) throw new Error('Failed to add content as project item');
+            }
+
+            const full = await loadItem(item.id);
+            console.log(`Got ProjectV2Item ${full.id} for project '${full.project?.title}' (via content lookup)`);
+            return full;

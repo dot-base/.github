@@ -11,6 +11,11 @@ on:
       pr:
         required: true
         type: string
+      org_project_v2_id:
+        required: false
+        type: string
+        default: "61"
+        ## ${{ vars.ORG_PROJECT_V2_ID }}
 
 jobs:
   configure-manually-opened-feature-pr:
@@ -23,45 +28,95 @@ jobs:
           github-token: ${{ secrets.GH_BOT_PAT }}
           script: |
             const pr = ${{ inputs.pr }};
-            console.log(`Trying to configure PR ${pr.number}.`);
+            console.log(`Trying to configure PR ${pr.number} via GraphQL.`);
 
-            console.log(`Setting assignee`);
-            await github.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+            // Resolve team ID and useful repo nodes
+            const idQuery = `
+              query($owner: String!, $repo: String!) {
+                organization(login: $owner) { team(slug: "development") { id } }
+                repository(owner: $owner, name: $repo) {
+                  milestones(first: 100, states: OPEN) { nodes { id title number } }
+                  issue(number: ${pr.number}) { id }
+                }
+              }
+            `;
+            const idData = await github.graphql(idQuery, {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: pr.number,
-              assignees: [ '${{ secrets.GH_BOT_USER }}' ]
             });
-            console.log(`Assignee set`);
 
-            console.log('Setting reviewers');
-            if ((!pr.requested_reviewers || !pr.requested_reviewers.length) && 
-                (!pr.requested_teams || !pr.requested_teams.length)) {
-              await github.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers', {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                team_reviewers: [ 'development' ]
-              });
+            const teamId = idData?.organization?.team?.id;
+            const milestoneNodes = idData?.repository?.milestones?.nodes || [];
+            const issueNodeId = idData?.repository?.issue?.id;
+
+            if (!teamId) throw new Error('Could not resolve team id for slug "development"');
+            if (!issueNodeId) throw new Error('Could not resolve issue node id for PR');
+
+            // Reviewers: add team if no review requests currently
+            console.log('Setting reviewers via GraphQL');
+            const rrNodes = pr?.reviewRequests?.nodes || [];
+            const hasCurrentRequests = rrNodes.some(n => !!n?.requestedReviewer);
+            if (!hasCurrentRequests) {
+              const requestReviews = `
+                mutation($pullRequestId: ID!, $teamIds: [ID!]) {
+                  requestReviews(input: { pullRequestId: $pullRequestId, teamIds: $teamIds }) {
+                    pullRequest { id number }
+                  }
+                }
+              `;
+              await github.graphql(requestReviews, { pullRequestId: pr.id, teamIds: [teamId] });
               console.log('Reviewers set');
-            } else console.log('Reviewers are already set');
+            } else {
+              console.log('Reviewers are already set');
+            }
 
-            console.log(`Setting milestone`);
+            // Milestone: set to 'next' if not set
+            console.log('Setting milestone via GraphQL');
             if (!pr.milestone) {
-              const milestones = await github.paginate('GET /repos/{owner}/{repo}/milestones', {
-                owner: context.repo.owner,
-                repo: context.repo.repo
-              })
-              const nextMilestone = milestones.find((m) => m.title === 'next');
-              if(!nextMilestone) throw "Milestone 'next' not found";
+              const nextMs = milestoneNodes.find(m => m.title === 'next');
+              if (!nextMs) throw new Error("Milestone 'next' not found");
+              const updateIssue = `
+                mutation($id: ID!, $milestoneId: ID) {
+                  updateIssue(input: { id: $id, milestoneId: $milestoneId }) { issue { id } }
+                }
+              `;
+              await github.graphql(updateIssue, { id: issueNodeId, milestoneId: nextMs.id });
+              console.log('Milestone set');
+            } else {
+              console.log('Milestone is already set');
+            }
 
-              await github.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr.number,
-                milestone: nextMilestone.number
-              })
-              console.log(`Milestone set`);
-            } else console.log('Milestone is already set');
+            // Add PR to org project board (Projects v2)
+            try {
+              console.log('Adding PR to project board https://github.com/orgs/dot-base/projects/61 via GraphQL');
+              const projectId = "${{ inputs.org_project_v2_id }}";
+
+              const addMutation = `
+                mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
+                    item { id }
+                  }
+                }
+              `;
+              await github.graphql(addMutation, { projectId, contentId: pr.id });
+              console.log('PR added to project board');
+            } catch (e) {
+              const msg = e?.message || String(e);
+              if (msg && msg.toLowerCase().includes('already exists in the project')) {
+                console.log('PR already in project board; skipping');
+              } else {
+                console.log('Failed to add PR to project board:', msg);
+                throw e;
+              }
+            }
 
             console.log(`PR ${pr.number} has been configured.`);
+
+  ensure-pr-in-project:
+    name: Ensure PR In Org Project
+    uses: dot-base/.github/.github/workflows/ensure-project-item.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      project_id: ${{ inputs.org_project_v2_id }}
+      content_node_id: ${{ fromJson(inputs.pr).id }}

@@ -1,0 +1,154 @@
+name: Close Parent When Last Sub-Issue Closed
+
+on:
+  # Auto-run when an issue is closed
+  issues:
+    types: [closed]
+  # Allow reuse from other workflows/repos
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      issue_number:
+        required: false
+        type: number
+
+jobs:
+  get-issue:
+    name: Get Issue
+    uses: dot-base/.github/.github/workflows/get-issue.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      issue_number: ${{ inputs.issue_number }}
+
+  close-parent-if-all-done:
+    name: Close parent if all sub-issues are closed
+    runs-on: ubuntu-latest
+    needs: get-issue
+    steps:
+      - name: Find and close parent issues if last sub-issue
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const issue = ${{ needs.get-issue.outputs.issue }};
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const thisUrl = `https://github.com/${owner}/${repo}/issues/${issue.number}`;
+            const thisShort = `${owner}/${repo}#${issue.number}`;
+            const thisHash = `#${issue.number}`;
+
+            // Search for open issues across the current owner/org that reference this issue in the body
+            const queries = [
+              `org:${owner} type:issue state:open in:body "${thisUrl}"`,
+              `org:${owner} type:issue state:open in:body "${thisShort}"`,
+              `repo:${owner}/${repo} type:issue state:open in:body "${thisHash}"`,
+            ];
+
+            const parents = [];
+            for (const q of queries) {
+              const data = await github.graphql(`
+                query($q: String!) {
+                  search(first: 50, type: ISSUE, query: $q) {
+                    nodes {
+                      __typename
+                      ... on Issue {
+                        id
+                        number
+                        title
+                        state
+                        url
+                        body
+                        repository { name owner { login } }
+                      }
+                    }
+                  }
+                }
+              `, { q });
+              for (const n of (data?.search?.nodes || [])) {
+                if (n?.__typename === 'Issue' && n.state === 'OPEN') {
+                  // De-duplicate by id
+                  if (!parents.some(p => p.id === n.id)) parents.push(n);
+                }
+              }
+            }
+
+            if (parents.length === 0) {
+              console.log('No open parent issues referencing this issue found.');
+              return;
+            }
+
+            // Helper to extract referenced issues from a body
+            function extractIssueRefs(body) {
+              const refs = [];
+              const add = (o, r, num) => refs.push({ owner: o, repo: r, number: Number(num) });
+              const fullRe = /https?:\/\/github\.com\/([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)\/issues\/(\d+)/g;
+              const crossRe = /\b([A-Za-z0-9_.-]+)\/([A-Za-z0-9_.-]+)#(\d+)\b/g;
+              const sameRe = /(^|\s)#(\d+)\b/g;
+              let m;
+              while ((m = fullRe.exec(body)) !== null) add(m[1], m[2], m[3]);
+              while ((m = crossRe.exec(body)) !== null) add(m[1], m[2], m[3]);
+              while ((m = sameRe.exec(body)) !== null) add(owner, repo, m[2]);
+              // De-dupe
+              const key = (x) => `${x.owner}/${x.repo}#${x.number}`;
+              const map = new Map();
+              for (const r of refs) map.set(key(r), r);
+              return Array.from(map.values());
+            }
+
+            // Collect parents that actually reference this issue (to avoid false positives)
+            const isSelfRef = (p) => p.body?.includes(thisUrl) || p.body?.includes(thisShort) || p.body?.includes(thisHash);
+            const candidateParents = parents.filter(isSelfRef);
+
+            if (candidateParents.length === 0) {
+              console.log('No parent issues with an explicit reference to this issue.');
+              return;
+            }
+
+            // For each parent, compile the set of referenced issues and check all are closed
+            for (const parent of candidateParents) {
+              const refs = extractIssueRefs(parent.body || '');
+              if (refs.length === 0) {
+                console.log(`Parent ${parent.url} has no referenced issues; skipping.`);
+                continue;
+              }
+
+              // Load states for each referenced issue
+              const groups = refs.reduce((acc, r) => {
+                const k = `${r.owner}/${r.repo}`;
+                acc[k] = acc[k] || [];
+                acc[k].push(r.number);
+                return acc;
+              }, {});
+
+              let allClosed = true;
+              for (const [k, numbers] of Object.entries(groups)) {
+                const [o, r] = k.split('/');
+                for (const n of numbers) {
+                  const data = await github.graphql(`
+                    query($owner: String!, $repo: String!, $number: Int!) {
+                      repository(owner: $owner, name: $repo) { issue(number: $number) { state url } }
+                    }
+                  `, { owner: o, repo: r, number: n });
+                  const st = data?.repository?.issue?.state;
+                  if (st !== 'CLOSED') {
+                    allClosed = false;
+                    break;
+                  }
+                }
+                if (!allClosed) break;
+              }
+
+              if (allClosed) {
+                // Close the parent issue
+                await github.graphql(`
+                  mutation($id: ID!) { closeIssue(input: { issueId: $id }) { issue { id state } } }
+                `, { id: parent.id });
+                console.log(`Closed parent issue ${parent.url} because all referenced issues are closed.`);
+              } else {
+                console.log(`Parent ${parent.url} still has open referenced issues; leaving open.`);
+              }
+            }
+

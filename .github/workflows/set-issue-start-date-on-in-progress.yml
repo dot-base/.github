@@ -1,0 +1,114 @@
+name: Set Issue Start Date On In Progress
+
+on:
+  # Trigger when a project item is edited (e.g., Status changed)
+  projects_v2_item:
+    types: [edited]
+  # Allow reuse from other workflows/repos
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      item_node_id:
+        required: false
+        type: string
+      content_node_id:
+        required: false
+        type: string
+      org_project_v2_id:
+        required: false
+        type: string
+        default: "61"
+
+jobs:
+  get-project-item:
+    name: Get Project Item
+    uses: dot-base/.github/.github/workflows/ensure-project-item.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      item_node_id: ${{ github.event.projects_v2_item.node_id }}
+      project_id: ${{ inputs.org_project_v2_id }}
+      content_node_id: ${{ inputs.content_node_id }}
+
+  set-start-date:
+    name: Set Start Date field
+    runs-on: ubuntu-latest
+    needs: get-project-item
+    steps:
+      - name: Update ProjectV2 Start Date if Status = In Progress and empty
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const inputProjectId = "${{ inputs.org_project_v2_id }}" || null;
+            const item = ${{ needs.get-project-item.outputs.item }};
+
+            if (!item || item.__typename !== 'ProjectV2Item') {
+              console.log('Not a ProjectV2Item; skipping');
+              return;
+            }
+
+            // Only process for issues
+            if (!item.content || item.content.__typename !== 'Issue') {
+              console.log('Project item content is not an Issue; skipping');
+              return;
+            }
+
+            // Optional guard: only handle a specific project if provided
+            const projectId = item.project?.id;
+            if (!projectId) {
+              console.log('No associated project found for item; skipping');
+              return;
+            }
+            if (inputProjectId && projectId !== inputProjectId) {
+              console.log(`Item belongs to project ${projectId}, not target ${inputProjectId}; skipping`);
+              return;
+            }
+
+            // Resolve fields
+            const fields = item.project?.fields?.nodes || [];
+            const startDateField = fields.find(f => f?.name === 'Start Date');
+            const statusField = fields.find(f => f?.name === 'Status');
+            if (!startDateField) {
+              console.log("Project field 'Start Date' not found; skipping");
+              return;
+            }
+            if (!statusField) {
+              console.log("Project field 'Status' not found; skipping");
+              return;
+            }
+
+            // Read current values
+            const values = item.fieldValues?.nodes || [];
+            const startDateValue = values.find(v => v?.field?.name === 'Start Date' && v.__typename === 'ProjectV2ItemFieldDateValue');
+            const statusValue = values.find(v => v?.field?.name === 'Status' && v.__typename === 'ProjectV2ItemFieldSingleSelectValue');
+
+            const statusName = statusValue?.name || null;
+            const hasStartDate = !!(startDateValue && startDateValue.date);
+
+            if (statusName !== 'In Progress') {
+              console.log(`Status is '${statusName ?? 'unset'}', not 'In Progress'; skipping`);
+              return;
+            }
+
+            if (hasStartDate) {
+              console.log('Start Date already set; not overwriting');
+              return;
+            }
+
+            // Set Start Date to today (UTC)
+            const today = new Date().toISOString().slice(0, 10);
+            await github.graphql(`
+              mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $date: Date!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId,
+                  itemId: $itemId,
+                  fieldId: $fieldId,
+                  value: { date: $date }
+                }) { projectV2Item { id } }
+              }
+            `, { projectId, itemId: item.id, fieldId: startDateField.id, date: today });
+
+            console.log(`Set Start Date for issue #${item.content.number} to ${today}`);

@@ -1,0 +1,15 @@
+name: Set Issue Start Date (Wrapper)
+
+# Copy this file into other repos at .github/workflows/
+# Requires repo secret GH_BOT_PAT and repo variable ORG_PROJECT_V2_ID
+
+on:
+  projects_v2_item:
+    types: [edited]
+
+jobs:
+  set-start-date:
+    name: Set Start Date when In Progress
+    uses: dot-base/.github/.github/workflows/set-issue-start-date-on-in-progress.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}

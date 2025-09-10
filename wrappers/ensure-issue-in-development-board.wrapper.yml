@@ -1,0 +1,16 @@
+name: Ensure Issue In Development Board (Wrapper)
+
+# Copy this file into other repos at .github/workflows/
+# Requires repo secret GH_BOT_PAT
+
+on:
+  issues:
+    types: [opened, reopened]
+
+jobs:
+  ensure-issue-in-project:
+    name: Ensure Issue In Org Project
+    uses: dot-base/.github/.github/workflows/ensure-issue-in-development-board.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+

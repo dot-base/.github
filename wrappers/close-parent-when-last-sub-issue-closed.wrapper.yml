@@ -1,0 +1,16 @@
+name: Close Parent When Last Sub-Issue Closed (Wrapper)
+
+# Copy into other repos at .github/workflows/
+# Requires repo secret GH_BOT_PAT
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  close-parent:
+    name: Close parent if all sub-issues are closed
+    uses: dot-base/.github/.github/workflows/close-parent-when-last-sub-issue-closed.yml@main
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+

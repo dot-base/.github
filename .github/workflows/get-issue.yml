@@ -1,0 +1,61 @@
+name: Get Issue
+
+on:
+  workflow_call:
+    secrets:
+      GH_BOT_PAT:
+        required: true
+    inputs:
+      issue_number:
+        required: false
+        type: number
+    outputs:
+      issue:
+        description: "The issue related to the triggering event or input"
+        value: ${{ jobs.get-issue.outputs.issue }}
+
+jobs:
+  get-issue:
+    name: Get Issue
+    runs-on: ubuntu-latest
+    outputs:
+      issue: ${{ steps.get_issue.outputs.result }}
+    steps:
+      - name: Get Issue via GraphQL
+        id: get_issue
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const issueNumber = context.payload.issue?.number ?? Number("${{ inputs.issue_number }}");
+            if (!issueNumber) throw new Error('Issue number not provided and no issue in payload.');
+
+            const query = `
+              query($owner: String!, $name: String!, $number: Int!) {
+                repository(owner: $owner, name: $name) {
+                  issue(number: $number) {
+                    id
+                    number
+                    title
+                    state
+                    url
+                    author { login }
+                    assignees(first: 10) { nodes { login } }
+                    labels(first: 20) { nodes { name } }
+                  }
+                }
+              }
+            `;
+
+            const data = await github.graphql(query, {
+              owner: context.repo.owner,
+              name: context.repo.repo,
+              number: issueNumber,
+            });
+
+            const issue = data?.repository?.issue;
+            if (!issue) throw new Error('Could not find issue via GraphQL.');
+
+            console.log(`Got issue via GraphQL: #${issue.number} '${issue.title}'`);
+            return issue;
+
