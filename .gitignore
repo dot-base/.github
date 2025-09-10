@@ -1,0 +1,43 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Secrets / env
+.env
+.env.local
+.secrets
+
+# Node
+node_modules/
+dist/
+build/
+.nyc_output/
+coverage/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+.venv/
+venv/
+.coverage
+coverage.xml
+
+# Nix / direnv
+.direnv/
+result
+
+# IDE
+.idea/
+.fleet/
+.history/
+*.swp
