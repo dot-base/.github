@@ -1,0 +1,15 @@
+name: Assign Issue To Dev Board
+
+on:
+  issues:
+    types: [opened, reopened]
+
+jobs:
+  assign-to-board:
+    uses: ./.github/workflows/assign-to-dev-board.yml
+    with:
+      # Pass the issue payload JSON; called workflow extracts node_id via fromJSON
+      issue: ${{ github.event.issue }}
+    secrets:
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+
