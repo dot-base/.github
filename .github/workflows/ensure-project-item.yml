@@ -38,6 +38,11 @@ jobs:
             const fromEvent = context.payload?.projects_v2_item?.node_id || context.payload?.projects_v2_item?.id || '';
             const projectId = "${{ inputs.project_id }}".trim();
             const contentId = "${{ inputs.content_node_id }}".trim();
+            console.log("test");
+            console.log(projectID);
+            console.log(contentID);
+
+
 
             async function loadItem(itemId) {
               const query = `
