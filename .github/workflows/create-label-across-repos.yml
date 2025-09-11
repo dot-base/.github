@@ -34,10 +34,12 @@ jobs:
             const descInput = "${{ inputs.description }}";
             const description = (descInput || '').toString();
 
-            let color = (colorInput || 'ededed').replace(/^#/, '').toLowerCase();
-            if (!/^[0-9a-f]{6}$/i.test(color)) {
-              console.log(`Invalid color '${colorInput}', defaulting to ededed`);
-              color = 'ededed';
+            let color = 'ededed';
+            colorInput = colorInput.replace(/^#/, '').toLowerCase();
+            if (/^[0-9a-f]{6}$/i.test(colorInput)) {
+              color = colorInput;
+            } else {
+              throw new Error(`Invalid color '${colorInput}'`);
             }
 
             console.log(`Ensuring label '${name}' (color #${color}${description ? `, desc '${description}'` : ''}) across owner '${owner}'`);
