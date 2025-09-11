@@ -6,10 +6,8 @@ on:
 
 jobs:
   assign-to-board:
-    uses: dot-base/.github/workflows/assign-issue-to-dev-board.yml@main
+    uses: dot-base/.github/.github/workflows/assign-issue-to-dev-board.yml@main
     with:
-      # Pass the issue payload JSON; called workflow extracts node_id via fromJSON
       issue: ${{ github.event.issue }}
     secrets:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
-
