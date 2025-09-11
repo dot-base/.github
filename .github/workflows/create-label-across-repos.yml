@@ -15,20 +15,6 @@ on:
         description: "Label description (optional)"
         required: false
         type: string
-  workflow_call:
-    secrets:
-      GH_BOT_PAT:
-        required: true
-    inputs:
-      name:
-        required: true
-        type: string
-      color:
-        required: false
-        type: string
-      description:
-        required: false
-        type: string
 
 jobs:
   create-label:
