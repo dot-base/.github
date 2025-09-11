@@ -6,7 +6,7 @@ on:
 
 jobs:
   assign-to-board:
-    uses: ./.github/workflows/assign-to-dev-board.yml
+    uses: dot-base/.github/workflows/assign-issue-to-dev-board.yml@main
     with:
       # Pass the issue payload JSON; called workflow extracts node_id via fromJSON
       issue: ${{ github.event.issue }}
