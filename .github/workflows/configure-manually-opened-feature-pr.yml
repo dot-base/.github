@@ -25,18 +25,6 @@ jobs:
             const pr = ${{ inputs.pr }};
             console.log(`Trying to configure PR ${pr.number}.`);
 
-            console.log('Setting reviewers');
-            if ((!pr.requested_reviewers || !pr.requested_reviewers.length) && 
-                (!pr.requested_teams || !pr.requested_teams.length)) {
-              await github.request('POST /repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers', {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                team_reviewers: [ 'development' ]
-              });
-              console.log('Reviewers set');
-            } else console.log('Reviewers are already set');
-
             console.log(`Setting milestone`);
             if (!pr.milestone) {
               const milestones = await github.paginate('GET /repos/{owner}/{repo}/milestones', {
