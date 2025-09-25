@@ -54,7 +54,7 @@ Replace `<your-org>` with your GitHub organization. Prefer pinning a tag or comm
 - `lint-pr-title.yml`: Enforce PR title conventions.
 - `create-release*.yml` and `release-pr-after-merge.yml`: Automate release flows.
 - `build-docker-image.yml`: Build and push Docker images.
-- `manage-pr.yml`, `get-pr.yml`, `sync-pr-after-merge.yml`: PR management utilities.
+- `manage-pr.yml`, `sync-pr-after-merge.yml`: PR management utilities.
 
 See the full list under `.github/workflows/`.
 

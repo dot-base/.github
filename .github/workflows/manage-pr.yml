@@ -45,30 +45,22 @@ jobs:
       SERVICE_TYPE: ${{ inputs.SERVICE_TYPE }}
       JAVA_VERSION: ${{ inputs.JAVA_VERSION }}
 
-  get-pr:
-    name: Get PR
-    uses: dot-base/.github/.github/workflows/get-pr.yml@main
-    secrets:
-      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
-      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
-
   lint-pr-title:
     name: Lint PR Title
-    needs: get-pr
     uses: dot-base/.github/.github/workflows/lint-pr-title.yml@main
     with:
-      pr: ${{ needs.get-pr.outputs.pr }}
+      pr: ${{ toJson(github.event.pull_request) }}
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
 
   configure-manually-opened-feature-pr:
     name: Configure Manually Opened Feature PR
-    needs: [get-pr, lint-pr-title]
-    if: fromJson(needs.get-pr.outputs.pr).type == 'feature'
+    needs: lint-pr-title
+    if: github.event.pull_request.base.ref == 'main'
     uses: dot-base/.github/.github/workflows/configure-manually-opened-feature-pr.yml@main
     with:
-      pr: ${{ needs.get-pr.outputs.pr }}
+      pr: ${{ toJson(github.event.pull_request) }}
     secrets:
       GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
