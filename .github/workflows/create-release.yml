@@ -80,16 +80,15 @@ jobs:
             return version.substring(1);
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         if: ${{ steps.changelog.outputs.skipped == 'false' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT }}
         with:
-          commitish: ${{ inputs.branch }}
           tag_name: ${{ steps.changelog.outputs.tag }}
-          release_name: ${{ steps.changelog.outputs.tag }}
           body: ${{ steps.changelog.outputs.clean_changelog }}
           prerelease: true
+          target_commitish: ${{ inputs.branch }}
 
       - name: Update latest-release tag
         if: ${{ steps.changelog.outputs.skipped == 'false' }}
