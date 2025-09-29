@@ -18,6 +18,14 @@ on:
       imageTag:
         description: "The Docker image tag corresponding to a release tag. This is without a leading 'v'!"
         value: ${{ jobs.create-release.outputs.imageTag }}
+    inputs:
+      SERVICE_TYPE:
+        required: true
+        type: string
+      RUN_NPM_PUBLISH:
+        required: false
+        type: string
+        default: "false"
 
 jobs:
   create-release:
@@ -128,3 +136,28 @@ jobs:
                 milestone: nextMilestone.data.number
               });
             }
+
+  build-docker-image:
+    if: inputs.SERVICE_TYPE == 'node' || inputs.SERVICE_TYPE == 'maven'
+    name: Build a Docker image for a new release
+    needs: create-release
+    uses: dot-base/.github/.github/workflows/build-docker-image.yml@main
+    with:
+      ref: ${{ needs.create-release.outputs.tag }}
+      imageTag: ${{ needs.create-release.outputs.imageTag }}
+    secrets:
+      GH_BOT_USER: ${{ secrets.GH_BOT_USER }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+      CR_PAT: ${{ secrets.CR_PAT }}
+      FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+
+  fhir-resource-npm-publish:
+    if: inputs.RUN_NPM_PUBLISH == 'true'
+    name: Publish a npm package for a new release
+    needs: create-release
+    uses: dot-base/.github/.github/workflows/fhir-resource-npm-publish.yml@main
+    with:
+      tag: ${{ needs.create-release.outputs.tag }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
