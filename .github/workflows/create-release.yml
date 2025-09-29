@@ -91,6 +91,57 @@ jobs:
           body: ${{ steps.changelog.outputs.clean_changelog }}
           prerelease: true
 
+      - name: Update latest-release tag
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GH_BOT_PAT }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const releaseTag = "${{ steps.changelog.outputs.tag }}";
+            const latestTagRef = "tags/latest-release";
+
+            const { data: releaseRef } = await github.rest.git.getRef({
+              owner,
+              repo,
+              ref: `tags/${releaseTag}`
+            });
+
+            let targetSha = releaseRef.object.sha;
+
+            // Annotated tags point to a tag object;
+            // resolve it so we update the ref with the commit SHA.
+            if (releaseRef.object.type === 'tag') {
+              const { data: tagData } = await github.rest.git.getTag({
+                owner,
+                repo,
+                tag_sha: targetSha
+              });
+              targetSha = tagData.object.sha;
+            }
+
+            try {
+              await github.rest.git.updateRef({
+                owner,
+                repo,
+                ref: latestTagRef,
+                sha: targetSha,
+                force: true
+              });
+            } catch (error) {
+              if (error.status === 404) {
+                await github.rest.git.createRef({
+                  owner,
+                  repo,
+                  ref: `refs/${latestTagRef}`,
+                  sha: targetSha
+                });
+              } else {
+                throw error;
+              }
+            }
+
       - name: Manage Milestones
         uses: actions/github-script@v6
         with:
