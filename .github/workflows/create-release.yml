@@ -19,6 +19,9 @@ on:
         description: "The Docker image tag corresponding to a release tag. This is without a leading 'v'!"
         value: ${{ jobs.create-release.outputs.imageTag }}
     inputs:
+      branch:
+        required: true
+        type: string
       SERVICE_TYPE:
         required: true
         type: string
@@ -82,7 +85,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT }}
         with:
-          commitish: "release"
+          commitish: ${{ inputs.branch }}
           tag_name: ${{ steps.changelog.outputs.tag }}
           release_name: ${{ steps.changelog.outputs.tag }}
           body: ${{ steps.changelog.outputs.clean_changelog }}
