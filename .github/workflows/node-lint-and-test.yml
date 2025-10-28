@@ -16,6 +16,10 @@ on:
         required: false
         type: string
         default: "false"
+      RUN_BUILD:
+        required: false
+        type: string
+        default: "false"
       RUN_TESTS:
         required: false
         type: string
@@ -100,8 +104,30 @@ jobs:
           FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
         run: npm install
 
-      - name: Test
+      - name: Typecheck
         run: npm run typecheck
+
+  build:
+    name: Build Project
+    needs: install-dependencies
+    runs-on: ubuntu-latest
+    if: ${{ inputs.RUN_BUILD == 'true' }}
+    steps:
+      - name: Check Out Repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install Dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: npm install
+
+      - name: Build
+        run: npm run build
 
   test-coverage:
     name: Create Test Coverage
