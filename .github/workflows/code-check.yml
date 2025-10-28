@@ -29,7 +29,7 @@ on:
 jobs:
   node-lint-and-test:
     name: Lint Files and Run Tests (Node Service)
-    uses: dot-base/.github/.github/workflows/node-lint-and-test.yml@main
+    uses: ./.github/workflows/node-lint-and-test.yml
     if: inputs.SERVICE_TYPE == 'node'
     secrets:
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}

@@ -39,7 +39,7 @@ on:
 jobs:
   code-check:
     name: Run code checks
-    uses: dot-base/.github/.github/workflows/code-check.yml@main
+    uses: ./.github/workflows/code-check.yml
     secrets:
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
