@@ -12,13 +12,17 @@ on:
       FONTAWESOME_NPM_AUTH_TOKEN:
         required: false
       NPM_TOKEN:
-          required: false
+        required: false
     inputs:
       RUN_COVERAGE:
         required: false
         type: string
         default: "false"
       RUN_TYPECHECK:
+        required: false
+        type: string
+        default: "false"
+      RUN_BUILD:
         required: false
         type: string
         default: "false"
@@ -42,6 +46,7 @@ jobs:
     with:
       RUN_COVERAGE: ${{ inputs.RUN_COVERAGE }}
       RUN_TYPECHECK: ${{ inputs.RUN_TYPECHECK }}
+      RUN_BUILD: ${{ inputs.RUN_BUILD }}
       SERVICE_TYPE: ${{ inputs.SERVICE_TYPE }}
       JAVA_VERSION: ${{ inputs.JAVA_VERSION }}
 
