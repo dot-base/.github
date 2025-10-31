@@ -26,35 +26,33 @@ jobs:
         with:
           github-token: ${{ secrets.GH_BOT_PAT || secrets.GITHUB_TOKEN }}
           script: |
-            const nameInput = "${{ inputs.name }}";
+            const nameInput = core.getInput('name', { required: true });
             if (!nameInput || !nameInput.trim()) throw new Error('name input is required');
             const owner = context.repo.owner;
             const name = nameInput.trim();
-            const colorInput = "${{ inputs.color }}";
-            const descInput = "${{ inputs.description }}";
-            const description = (descInput || '').toString();
 
             let color = 'ededed';
-            colorInput = colorInput.replace(/^#/, '').toLowerCase();
-            if (/^[0-9a-f]{6}$/i.test(colorInput)) {
+            let colorInput = core.getInput('color');
+            if (typeof colorInput === 'string' && colorInput.trim().length > 0) {
+              colorInput = colorInput.trim().replace(/^#/, '').toLowerCase();
+              if (!/^[0-9a-f]{6}$/i.test(colorInput)) {
+                throw new Error(`Invalid color '${colorInput}'. Use 6 hex chars, no leading #.`);
+              }
               color = colorInput;
-            } else {
-              throw new Error(`Invalid color '${colorInput}'`);
             }
+
+            const descInput = core.getInput('description');
+            const description = (descInput ?? '').toString();
 
             console.log(`Ensuring label '${name}' (color #${color}${description ? `, desc '${description}'` : ''}) across owner '${owner}'`);
 
             // Fetch repositories for org or user with pagination, skipping archived
             async function listReposForOwner(owner) {
               try {
-                const repos = await github.paginate(github.rest.repos.listForOrg, { org: owner, per_page: 100, type: 'all' });
-                return repos;
+                return await github.paginate(github.rest.repos.listForOrg, { org: owner, per_page: 100, type: 'all' });
               } catch (e) {
-                const msg = e?.message || '';
-                if (msg.includes('Not Found') || e.status === 404) {
-                  // Try as user
-                  const repos = await github.paginate(github.rest.repos.listForUser, { username: owner, per_page: 100, type: 'all' });
-                  return repos;
+                if ((e?.message || '').includes('Not Found') || e?.status === 404) {
+                  return await github.paginate(github.rest.repos.listForUser, { username: owner, per_page: 100, type: 'all' });
                 }
                 throw e;
               }
@@ -65,25 +63,28 @@ jobs:
 
             let created = 0, updated = 0, skipped = 0, failed = 0;
             for (const r of repos) {
-              if (r.archived) { skipped++; continue; }
-              const repoName = r.name;
+              if (r.archived || r.disabled || r.private && !r.permissions?.push) { skipped++; continue; }
+
+              const repo = r.name;
               try {
-                // Try to create first
-                await github.rest.issues.createLabel({ owner, repo: repoName, name, color, description });
-                created++;
-                console.log(`[created] ${owner}/${repoName}`);
-              } catch (e) {
-                const status = e?.status;
-                const msg = e?.message || '';
-                if (status === 422 || (typeof msg === 'string' && msg.toLowerCase().includes('already exists'))) {
-                  // Update existing (PATCH requires current name in path)
-                  await github.rest.issues.updateLabel({ owner, repo: repoName, name, color, description });
-                  updated++;
-                  console.log(`[updated] ${owner}/${repoName}`);
-                } else {
-                  failed++;
-                  console.log(`[failed] ${owner}/${repoName}: ${msg}`);
+                // Try GET first for clearer branching
+                let exists = true;
+                try {
+                  await github.rest.issues.getLabel({ owner, repo, name });
+                } catch (e) {
+                  if (e?.status === 404) exists = false; else throw e;
                 }
+
+                if (!exists) {
+                  await github.rest.issues.createLabel({ owner, repo, name, color, description });
+                  created++; console.log(`[created] ${owner}/${repo}`);
+                } else {
+                  await github.rest.issues.updateLabel({ owner, repo, name, color, description });
+                  updated++; console.log(`[updated] ${owner}/${repo}`);
+                }
+              } catch (e) {
+                failed++;
+                console.log(`[failed] ${owner}/${repo}: ${e?.status || ''} ${e?.message || e}`);
               }
             }
 
