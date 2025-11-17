@@ -191,7 +191,7 @@ jobs:
             }
 
   build-docker-image:
-    if: inputs.SERVICE_TYPE == 'node' || inputs.SERVICE_TYPE == 'maven'
+    if: inputs.SERVICE_TYPE == 'node' || inputs.SERVICE_TYPE == 'maven' || inputs.SERVICE_TYPE == 'flutter'
     name: Build a Docker image for a new release
     needs: create-release
     uses: dot-base/.github/.github/workflows/build-docker-image.yml@main
