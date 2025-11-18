@@ -3,12 +3,6 @@ name: Deploy Storybook
 on:
   workflow_call:
     secrets:
-      GH_BOT_USER:
-        required: true
-      GH_BOT_PAT:
-        required: true
-      CR_PAT:
-        required: true
       FONTAWESOME_NPM_AUTH_TOKEN:
         required: true
 
