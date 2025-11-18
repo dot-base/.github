@@ -1,0 +1,50 @@
+name: E2E Tests
+
+on:
+  workflow_call:
+    secrets:
+      FONTAWESOME_NPM_AUTH_TOKEN:
+        required: true
+      E2E_USERNAME:
+        required: true
+      E2E_PASSWORD:
+        required: true
+      GH_BOT_PAT:
+        required: true
+
+jobs:
+  e2e-test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          repository: dot-base/frontend
+          token: ${{ secrets.GH_BOT_PAT }}
+          ref: main
+      - uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+      - name: Setup Env file
+        env:
+          E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          E2E_INSTANCE_URL: ${{ vars.E2E_INSTANCE_URL }}
+        run: |
+          echo E2E_USERNAME=$E2E_USERNAME > .env
+          echo E2E_PASSWORD=$E2E_PASSWORD >> .env
+          echo E2E_INSTANCE_URL=$E2E_INSTANCE_URL >> .env
+      - name: Install dependencies
+        env:
+          FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npm run e2e:ci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

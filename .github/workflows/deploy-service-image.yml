@@ -1,0 +1,54 @@
+name: Deploy Service Image
+
+on:
+  workflow_call:
+    inputs:
+      instance:
+        type: string
+        required: true
+        description: "The instance you want to deploy to. (e.g. 'dev-main')"
+      URL:
+        type: string
+        required: true
+        description: "The instance URL. (e.g. 'https://main.dotbase.dev')"
+      image:
+        type: string
+        required: true
+        description: "The docker image. (e.g. 'ghcr.io/dot-base/frontend:main')"
+      service:
+        type: string
+        required: true
+        description: "The service that shoudl be deployed. (e.g. 'frontend' without the stack prefix, in this case 'dev-main_frontend' will be deployed)"
+
+jobs:
+  deploy-service-image:
+    name: Deploying ${{inputs.service}}
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{inputs.instance}}
+      url: ${{inputs.URL}}
+    steps:
+      - name: Deploying ${{inputs.image}} for service ${{inputs.service}} to instance ${{inputs.instance}}
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          SSH_SERVER: ${{ vars.SSH_SERVER }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          #set -x
+
+          if [[ ! -n "$SSH_SERVER" || ! -n "$SSH_KNOWN_HOSTS" || ! -n "$SSH_USER" || ! -n "$SSH_KEY" ]]; then
+            echo "This environment is not configured correctly."
+            echo "Verify all github secrets are set and named correctly for the instance selected: ${{inputs.instance}}"
+            exit 1
+          fi
+          echo "$SSH_KEY" > /tmp/ssh.key
+          echo "$SSH_KNOWN_HOSTS" > /tmp/known_hosts
+
+          chmod 600 /tmp/ssh.key
+          chmod 600 /tmp/known_hosts
+
+          # log into docker registry, to pull private container images
+          echo "${{ secrets.CR_PAT }}" | ssh -i /tmp/ssh.key -o UserKnownHostsFile=/tmp/known_hosts $SSH_USER@$SSH_SERVER docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          ssh -i /tmp/ssh.key -o UserKnownHostsFile=/tmp/known_hosts $SSH_USER@$SSH_SERVER TERM=xterm docker service update --with-registry-auth --image="${{inputs.image}}" ${{ inputs.instance }}_${{ inputs.service }}
