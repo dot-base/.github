@@ -17,12 +17,6 @@ on:
         required: true
       SLACK_WEBHOOK_URL:
         required: true
-      SSH_KEY:
-        required: true
-      SSH_KNOWN_HOSTS:
-        required: true
-      SSH_USER:
-        required: true
     inputs:
       SSH_SERVER:
         required: true
