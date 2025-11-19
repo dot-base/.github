@@ -17,7 +17,16 @@ on:
         required: true
       SLACK_WEBHOOK_URL:
         required: true
+      SSH_KEY:
+        required: true
+      SSH_KNOWN_HOSTS:
+        required: true
+      SSH_USER:
+        required: true
     inputs:
+      SSH_SERVER:
+        required: true
+        type: string
       SERVICE_NAME:
         required: true
         type: string
@@ -66,7 +75,11 @@ jobs:
       service: ${{ inputs.SERVICE_NAME }}
       image: ghcr.io/dot-base/${{ inputs.SERVICE_NAME }}:main
       URL: https://main.dotbase.dev
-    secrets: inherit
+      SSH_SERVER: ${{ inputs.SSH_SERVER }}
+    secrets:
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+      SSH_USER: ${{ secrets.SSH_USER }}
 
   deploy-storybook:
     if: ${{ inputs.DEPLOY_STORYBOOK == 'true' }}
