@@ -9,9 +9,10 @@ on:
         required: true
       SSH_USER:
         required: true
+    inputs:
       SSH_SERVER:
         required: true
-    inputs:
+        type: string
       instance:
         type: string
         required: true
@@ -41,7 +42,7 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
           SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
-          SSH_SERVER: ${{ secrets.SSH_SERVER }}
+          SSH_SERVER: ${{ inputs.SSH_SERVER }}
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
           #set -x

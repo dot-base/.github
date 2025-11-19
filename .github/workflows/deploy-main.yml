@@ -23,9 +23,10 @@ on:
         required: true
       SSH_USER:
         required: true
+    inputs:
       SSH_SERVER:
         required: true
-    inputs:
+        type: string
       E2E_INSTANCE_URL:
         required: true
         type: string
@@ -76,8 +77,8 @@ jobs:
       service: ${{ inputs.SERVICE_NAME }}
       image: ghcr.io/dot-base/${{ inputs.SERVICE_NAME }}:main
       URL: https://main.dotbase.dev
+      SSH_SERVER: ${{ inputs.SSH_SERVER }}
     secrets:
-      SSH_SERVER: ${{ secrets.SSH_SERVER }}
       SSH_KEY: ${{ secrets.SSH_KEY }}
       SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
       SSH_USER: ${{ secrets.SSH_USER }}
