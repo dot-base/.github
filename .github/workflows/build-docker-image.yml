@@ -115,7 +115,7 @@ jobs:
   create-docker-manifest:
     needs: [build-amd64-docker-image, build-arm64-docker-image]
     runs-on: ubuntu-latest
-    name: Create and build docker manifest
+    name: Create Docker Manifest
     steps:
       - uses: docker/login-action@v3
         with:
