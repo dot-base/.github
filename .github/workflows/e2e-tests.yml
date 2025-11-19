@@ -11,6 +11,10 @@ on:
         required: true
       GH_BOT_PAT:
         required: true
+    inputs:
+      E2E_INSTANCE_URL:
+        required: true
+        type: string
 
 jobs:
   e2e-test:
@@ -29,7 +33,7 @@ jobs:
         env:
           E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
           E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
-          E2E_INSTANCE_URL: ${{ vars.E2E_INSTANCE_URL }}
+          E2E_INSTANCE_URL: ${{ inputs.E2E_INSTANCE_URL }}
         run: |
           echo E2E_USERNAME=$E2E_USERNAME > .env
           echo E2E_PASSWORD=$E2E_PASSWORD >> .env

@@ -26,6 +26,9 @@ on:
       SSH_SERVER:
         required: true
     inputs:
+      E2E_INSTANCE_URL:
+        required: true
+        type: string
       SERVICE_NAME:
         required: true
         type: string
@@ -95,6 +98,8 @@ jobs:
       E2E_USERNAME: ${{ secrets.E2E_USERNAME }}
       E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
       GH_BOT_PAT: ${{ secrets.GH_BOT_PAT }}
+    with:
+      E2E_INSTANCE_URL: ${{ inputs.E2E_INSTANCE_URL }}
 
   send-slack-notification:
     name: Send Slack Notification
