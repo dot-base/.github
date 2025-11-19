@@ -1,4 +1,4 @@
-name: Deploy main (and storybook)
+name: Deploy main
 
 on:
   workflow_call:
@@ -58,7 +58,7 @@ jobs:
       RUN_TYPECHECK: ${{ inputs.RUN_TYPECHECK }}
 
   build-image:
-    name: Build Docker Image for main
+    name: Build Docker Image
     uses: dot-base/.github/.github/workflows/build-docker-image.yml@main
     with:
       ref: main
@@ -70,7 +70,7 @@ jobs:
       FONTAWESOME_NPM_AUTH_TOKEN: ${{ secrets.FONTAWESOME_NPM_AUTH_TOKEN }}
 
   deploy-image:
-    name: Deploy main on main.dotbase.dev
+    name: Deploy Service
     uses: dot-base/.github/.github/workflows/deploy-service-image.yml@chore/add-deploy-main
     needs: [lint-and-test, build-image]
     with:
@@ -87,7 +87,7 @@ jobs:
 
   deploy-storybook:
     if: ${{ inputs.DEPLOY_STORYBOOK == 'true' }}
-    name: Deploy Storybook on ui.dotbase.dev
+    name: Deploy Storybook
     uses: dot-base/.github/.github/workflows/deploy-storybook.yml@chore/add-deploy-main
     needs: [lint-and-test]
     secrets:
@@ -106,7 +106,7 @@ jobs:
       E2E_INSTANCE_URL: ${{ inputs.E2E_INSTANCE_URL }}
 
   send-slack-notification:
-    name: Send Slack Notification
+    name: Slack Notification
     uses: dot-base/.github/.github/workflows/send-slack-message.yml@main
     needs: [e2e-tests]
     if: ${{ always() }}
