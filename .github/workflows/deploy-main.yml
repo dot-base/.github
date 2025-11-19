@@ -69,7 +69,6 @@ jobs:
   deploy-image:
     name: Deploy main on main.dotbase.dev
     uses: dot-base/.github/.github/workflows/deploy-service-image.yml@chore/add-deploy-main
-    needs: [lint-and-test, build-image]
     with:
       instance: dev-main
       service: ${{ inputs.SERVICE_NAME }}
