@@ -9,6 +9,8 @@ on:
         required: true
       SSH_USER:
         required: true
+      CR_PAT:
+        required: true
     inputs:
       SSH_SERVER:
         required: true
