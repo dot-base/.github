@@ -3,12 +3,6 @@ name: Deploy Service Image
 on:
   workflow_call:
     secrets:
-      SSH_KEY:
-        required: true
-      SSH_KNOWN_HOSTS:
-        required: true
-      SSH_USER:
-        required: true
       CR_PAT:
         required: true
     inputs:
