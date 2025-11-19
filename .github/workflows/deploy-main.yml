@@ -18,6 +18,9 @@ on:
       SLACK_WEBHOOK_URL:
         required: true
     inputs:
+      SERVICE_NAME:
+        required: true
+        type: string
       DEPLOY_STORYBOOK:
         required: false
         type: string
@@ -92,5 +95,5 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       status: ${{ needs.e2e-tests.result == 'success' && 'success' || 'failure' }}
-      serviceName: "frontend"
+      serviceName: ${{ inputs.SERVICE_NAME }}
       url: "https://main.dotbase.dev"
