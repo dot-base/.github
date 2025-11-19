@@ -63,8 +63,8 @@ jobs:
     needs: [lint-and-test, build-image]
     with:
       instance: dev-main
-      service: frontend
-      image: ghcr.io/dot-base/frontend:main
+      service: ${{ inputs.SERVICE_NAME }}
+      image: ghcr.io/dot-base/${{ inputs.SERVICE_NAME }}:main
       URL: https://main.dotbase.dev
     secrets: inherit
 
