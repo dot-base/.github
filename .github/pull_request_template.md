@@ -8,7 +8,7 @@ Provide a description of the changes. Also include motivation and context of the
 
 ## Is there something controversial? 🚨
 
-Take sometime time to explain your choices.
+Take some time to explain your choices.
 This can also include further thoughts, ideas and improvements.
 
 # How to Test? 🧪
