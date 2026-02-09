@@ -1,6 +1,6 @@
 # Ticket 🎫
 
-This closes https://github.com/dot-base/dotclinic/issues/XXXX
+This closes <Linear URL>.
 
 # Description 📖
 
