@@ -17,11 +17,11 @@ Provide a list of instructions how to test the changes of this PR.
 
 # Breaking Changes ⚡️
 
-This PR has
+This PR has **no** changes that
 
-- [ ] no migrations
-- [ ] no API changes (removing or changing existing APIs)
-- [ ] no config changes
-- [ ] no changes that would require updates in other repos to avoid breaking them
+- [ ] require migrations
+- [ ] break a public API (removing or changing existing endpoints)
+- [ ] require config changes (ENV vars)
+- [ ] require PRs in other repos to be merged first (e.g. due to implementing a breaking API change)
 
 BREAKING CHANGE: If you cannot tick all boxes, there is a breaking change. In this case, add a description here after the keyword. Otherwise DELETE this line or it will falsely trigger a major version change.
